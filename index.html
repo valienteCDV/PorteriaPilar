@@ -2,17 +2,23 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- Línea que refresca la página cada 40 segundos -->
     <meta http-equiv="refresh" content="40">
     <title>Hoja Actualizada</title>
     <style>
+        /* Estilos generales para el cuerpo y el html. Especifica la fuente Arial */
         body, html {
             font-family: Arial, sans-serif;
         }
+
+        /* Estilos para el iframe que carga tu hoja de Google. Ocupa todo el ancho y el 90% del alto de la vista */
         iframe {
             width: 100%;
-            height: 90vh; /* Ajustado para dar espacio al encabezado */
+            height: 90vh;
             border: none;
         }
+
+        /* Estilos para el encabezado que contiene el reloj y el calendario. Se utiliza flexbox para la disposición */
         #header {
             display: flex;
             justify-content: space-between;
@@ -20,40 +26,58 @@
             background-color: #333;
             color: #fff;
         }
+
+        /* Estilos para el reloj y el calendario, especificando un tamaño de fuente */
         #clock, #calendar {
             font-size: 29px;
         }
     </style>
 </head>
 <body>
+    <!-- Encabezado que contiene el reloj y el calendario -->
     <div id="header">
         <div id="clock"></div>
         <div id="calendar"></div>
     </div>
+    
+    <!-- Iframe que carga la hoja de Google Sheets -->
     <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSRjULNltaOkGgs2FzrSlB9ZsAz06vRbkMLVfuDPA7eTcRgiH2BrxQjqiCwsgi6r-RowjBviguzuhpZ/pubhtml?gid=2021560536&single=true"></iframe>
     
     <script>
+        /* Evento que se dispara cuando el contenido del documento ha sido completamente cargado */
         document.addEventListener("DOMContentLoaded", function() {
+            /* Al cargar, actualizamos el reloj y el calendario por primera vez */
             updateClock();
             updateCalendar();
-            setInterval(updateClock, 1000); // Actualiza el reloj cada segundo
-            setInterval(updateCalendar, 60000); // Actualiza el calendario cada minuto
+            
+            /* Establece intervalos para actualizar el reloj cada segundo y el calendario cada minuto */
+            setInterval(updateClock, 1000);
+            setInterval(updateCalendar, 60000);
         });
 
+        /* Función que actualiza la hora mostrada en el reloj */
         function updateClock() {
+            /* Obtiene la fecha y hora actual */
             const now = new Date();
+            
+            /* Formatea las horas, minutos y segundos para que siempre tengan dos dígitos */
             const hours = String(now.getHours()).padStart(2, '0');
             const minutes = String(now.getMinutes()).padStart(2, '0');
             const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            /* Muestra la hora formateada en el elemento con id "clock" */
             document.getElementById('clock').textContent = hours + ':' + minutes + ':' + seconds;
         }
 
+        /* Función que actualiza la fecha mostrada en el calendario */
         function updateCalendar() {
+            /* Opciones para el formato de la fecha */
             const options = { year: 'numeric', month: 'long', day: 'numeric' };
             const now = new Date();
+            
+            /* Muestra la fecha formateada en el elemento con id "calendar" */
             document.getElementById('calendar').textContent = now.toLocaleDateString(undefined, options);
         }
     </script>
 </body>
 </html>
-
