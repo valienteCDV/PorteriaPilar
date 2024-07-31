@@ -2,11 +2,9 @@ const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbytUUnWCA3I3JLdLOv8r
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
 
 function loadWeatherData() {
-  console.log('Cargando datos meteorológicos...');
   fetch(WEATHER_API_URL)
     .then(response => response.json())
     .then(data => {
-      console.log('Datos meteorológicos recibidos:', data);
       const currentWeather = data.current_weather;
       const currentHour = new Date().getHours();
       const weatherHtml = `
@@ -59,7 +57,7 @@ function processData(data) {
   };
 
   data.forEach(entry => {
-    if (entry.horaSalida) return; // Ignorar entradas con hora de salida
+    if (!entry.horaSalida) {  // Solo procesar entradas sin hora de salida
 
     let section;
     if (entry.empresa === 'EPEC BICENTENARIO') {
@@ -130,7 +128,7 @@ function init() {
   loadSheetsData();
   updateClock();
   loadWeatherData();
-  setInterval(loadSheetsData, 300000); // Actualizar datos cada 5 minutos
+  setInterval(loadSheetsData, 100000); // Actualizar datos cada 2 minutos
   setInterval(updateClock, 1000); // Actualizar reloj cada segundo
   setInterval(loadWeatherData, 600000); // Actualizar clima cada 10 minutos
 }
