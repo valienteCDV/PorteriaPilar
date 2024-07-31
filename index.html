@@ -14,9 +14,9 @@
         .header {
             background-color: #0066cc;
             color: white;
-            padding: 5px 0;
+            padding: 10px 0;
         }
-        .total-personas, .total-camiones {
+        .total-info, .weather-info {
             background-color: #ffffff;
             border-left: 5px solid #0066cc;
             padding: 15px;
@@ -29,6 +29,7 @@
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 20px;
+            height: calc(100% - 20px);
         }
         .section-header {
             padding: 15px;
@@ -38,6 +39,8 @@
         }
         .section-content {
             padding: 15px;
+            overflow-y: auto;
+            max-height: calc(100% - 60px);
         }
         .contratistas .section-header { background-color: #ff7f50; }
         .epec-bicentenario .section-header { background-color: #3cb371; }
@@ -55,7 +58,7 @@
 </head>
 <body>
     <div class="header">
-        <div class="container">
+        <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-md-6">
                     <h1><i class="fas fa-building"></i> Central Bicentenario</h1>
@@ -68,49 +71,61 @@
         </div>
     </div>
 
-    <div class="container mt-4">
-        <div class="total-personas">
-            <h2 class="mb-0"><i class="fas fa-users"></i> Personas en Planta: <span id="total-personas" class="badge bg-primary">0</span></h2>
-        </div>
-
-        <div class="total-camiones">
-            <h2 class="mb-0"><i class="fas fa-truck"></i> Camiones de Gasoil: <span id="total-camiones" class="badge bg-primary">0</span></h2>
-        </div>
-
+    <div class="container-fluid mt-4">
         <div class="row">
-            <div class="col-md-6 col-lg-3">
-                <div class="section contratistas">
-                    <div class="section-header">
-                        <i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS
+            <div class="col-md-8">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="total-info">
+                            <h2 class="mb-0"><i class="fas fa-users"></i> Personas en Planta: <span id="total-personas" class="badge bg-primary">0</span></h2>
+                        </div>
                     </div>
-                    <div class="section-content" id="contratistas"></div>
+                    <div class="col-md-6">
+                        <div class="total-info">
+                            <h2 class="mb-0"><i class="fas fa-truck"></i> Camiones de Gasoil: <span id="total-camiones" class="badge bg-primary">0</span></h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 col-lg-3">
+                        <div class="section contratistas">
+                            <div class="section-header">
+                                <i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS
+                            </div>
+                            <div class="section-content" id="contratistas"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="section epec-bicentenario">
+                            <div class="section-header">
+                                <i class="fas fa-bolt"></i> EPEC BICENTENARIO
+                            </div>
+                            <div class="section-content" id="epec-bicentenario"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="section eling">
+                            <div class="section-header">
+                                <i class="fas fa-industry"></i> ELING
+                            </div>
+                            <div class="section-content" id="eling"></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-lg-3">
+                        <div class="section epec-eor">
+                            <div class="section-header">
+                                <i class="fas fa-cogs"></i> EPEC EOR
+                            </div>
+                            <div class="section-content" id="epec-eor"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="section epec-bicentenario">
-                    <div class="section-header">
-                        <i class="fas fa-bolt"></i> EPEC BICENTENARIO
-                    </div>
-                    <div class="section-content" id="epec-bicentenario"></div>
+            <div class="col-md-4">
+                <div class="weather-info">
+                    <h2><i class="fas fa-cloud-sun"></i> Clima en Pilar, Córdoba</h2>
+                    <div id="weather-data"></div>
                 </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="section eling">
-                    <div class="section-header">
-                        <i class="fas fa-industry"></i> ELING
-                    </div>
-                    <div class="section-content" id="eling"></div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
-                <div class="section epec-eor">
-                    <div class="section-header">
-                        <i class="fas fa-cogs"></i> EPEC EOR
-                    </div>
-                    <div class="section-content" id="epec-eor"></div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-3">
                 <div class="section camiones">
                     <div class="section-header">
                         <i class="fas fa-truck"></i> CAMIONES DE GASOIL
