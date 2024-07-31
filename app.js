@@ -10,34 +10,27 @@ const CREDENTIALS = {
 
 // Función para cargar los datos de la hoja de cálculo
 function loadSheetsData() {
-  const client = new google.auth.JWT(
-    CREDENTIALS.client_email,
-    null,
-    CREDENTIALS.private_key,
-    ['https://www.googleapis.com/auth/spreadsheets.readonly']
-  );
+  gapi.load('client', initClient);
+}
 
-  client.authorize((err, tokens) => {
-    if (err) {
-      console.error(err);
-      return;
-    }
-    const sheets = google.sheets({ version: 'v4', auth: client });
-    sheets.spreadsheets.values.get({
+function initClient() {
+  gapi.client.init({
+    apiKey: 'AIzaSyBhMaVzPTVDlQ5pTNAo3dV0ICmwGZ8o9B4',
+    discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
+  }).then(function() {
+    return gapi.client.sheets.spreadsheets.values.get({
       spreadsheetId: SPREADSHEET_ID,
       range: RANGE,
-    }, (err, res) => {
-      if (err) {
-        console.error('The API returned an error: ' + err);
-        return;
-      }
-      const rows = res.data.values;
-      if (rows.length) {
-        processData(rows);
-      } else {
-        console.log('No data found.');
-      }
     });
+  }).then(function(response) {
+    const data = response.result.values;
+    if (data && data.length > 0) {
+      processData(data);
+    } else {
+      console.log('No data found.');
+    }
+  }, function(error) {
+    console.error('Error loading sheet data:', error);
   });
 }
 
@@ -65,7 +58,7 @@ function processData(data) {
 
     const personElement = document.createElement('div');
     personElement.className = 'person';
-    personElement.textContent = `${nombre}`;
+    personElement.textContent = nombre;
     section.appendChild(personElement);
 
     total++;
@@ -78,13 +71,8 @@ function processData(data) {
 function updateClock() {
   const now = new Date();
   const timeString = now.toLocaleTimeString();
-  document.getElementById('clock').textContent = timeString;
-}
-
-// Función para actualizar la fecha
-function updateDate() {
-  const now = new Date();
   const dateString = now.toLocaleDateString();
+  document.getElementById('clock').textContent = timeString;
   document.getElementById('date').textContent = dateString;
 }
 
@@ -92,11 +80,9 @@ function updateDate() {
 function init() {
   loadSheetsData();
   updateClock();
-  updateDate();
   setInterval(loadSheetsData, 300000); // Actualizar datos cada 5 minutos
   setInterval(updateClock, 1000); // Actualizar reloj cada segundo
-  setInterval(updateDate, 60000); // Actualizar fecha cada minuto
 }
 
-// Cargar la biblioteca de Google y inicializar
-gapi.load('client', init);
+// Iniciar la aplicación cuando la página esté cargada
+document.addEventListener('DOMContentLoaded', init);
