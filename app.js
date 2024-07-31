@@ -37,10 +37,10 @@ function loadSheetsData() {
 function processData(data) {
   console.log('Procesando datos:', data);
   const sections = {
-    contratistas: document.getElementById('contratistas'),
     epecBicentenario: document.getElementById('epec-bicentenario'),
-    eling: document.getElementById('eling'),
     epecEor: document.getElementById('epec-eor'),
+    eling: document.getElementById('eling'),
+    contratistas: document.getElementById('contratistas'),
     camiones: document.getElementById('camiones')
   };
 
@@ -50,53 +50,90 @@ function processData(data) {
   let totalPersonas = 0;
   let totalCamiones = 0;
   let personasPorEmpresa = {
-    contratistas: 0,
     epecBicentenario: 0,
+    epecEor: 0,
     eling: 0,
-    epecEor: 0
+    contratistas: 0
   };
 
+  let contratistasData = {};
+
   data.forEach(entry => {
-    let section;
-    if (entry.empresa === 'EPEC BICENTENARIO') {
-      section = sections.epecBicentenario;
-      personasPorEmpresa.epecBicentenario++;
-    } else if (entry.empresa === 'ELING') {
-      section = sections.eling;
-      personasPorEmpresa.eling++;
-    } else if (entry.empresa === 'EPEC EOR') {
-      section = sections.epecEor;
-      personasPorEmpresa.epecEor++;
-    } else {
-      section = sections.contratistas;
-      personasPorEmpresa.contratistas++;
-    }
+    if (!entry.horaSalida) {  // Solo procesar entradas sin hora de salida
+      let section;
+      if (entry.empresa === 'EPEC BICENTENARIO') {
+        section = sections.epecBicentenario;
+        personasPorEmpresa.epecBicentenario++;
+      } else if (entry.empresa === 'EPEC EOR') {
+        section = sections.epecEor;
+        personasPorEmpresa.epecEor++;
+      } else if (entry.empresa === 'ELING') {
+        section = sections.eling;
+        personasPorEmpresa.eling++;
+      } else {
+        section = sections.contratistas;
+        personasPorEmpresa.contratistas++;
+        if (!contratistasData[entry.empresa]) {
+          contratistasData[entry.empresa] = [];
+        }
+        contratistasData[entry.empresa].push(entry);
+      }
 
-    const personElement = document.createElement('div');
-    personElement.className = 'person';
-    personElement.textContent = `${entry.nombreCompleto}${entry.patente ? ` (🚗 ${entry.patente})` : ''}`;
-    section.appendChild(personElement);
-    totalPersonas++;
+      if (section !== sections.contratistas) {
+        const personElement = document.createElement('div');
+        personElement.className = 'person';
+        const icon = entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : '🚗';
+        personElement.textContent = `${entry.nombreCompleto}${entry.patente ? ` (${icon} ${entry.patente})` : ''}`;
+        section.appendChild(personElement);
+      }
 
-    // Asumimos que todos los vehículos son potenciales camiones de gasoil
-    if (entry.patente) {
-      const camionElement = document.createElement('div');
-      camionElement.className = 'person';
-      camionElement.textContent = `${entry.nombreCompleto} (🚛 ${entry.patente})`;
-      sections.camiones.appendChild(camionElement);
-      totalCamiones++;
+      totalPersonas++;
+
+      if (entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL') {
+        const camionElement = document.createElement('div');
+        camionElement.className = 'person';
+        camionElement.textContent = `${entry.nombreCompleto} (🚛 ${entry.patente || 'N/A'})`;
+        sections.camiones.appendChild(camionElement);
+        totalCamiones++;
+      }
     }
   });
 
   document.getElementById('total-personas').textContent = totalPersonas;
   document.getElementById('total-camiones').textContent = totalCamiones;
 
-  // Actualizar contadores por empresa
+  // Actualizar contadores por empresa y mostrar/ocultar secciones
   Object.entries(personasPorEmpresa).forEach(([empresa, count]) => {
-    const countElement = document.createElement('div');
-    countElement.className = 'text-end fw-bold';
-    countElement.textContent = `Total: ${count}`;
-    sections[empresa].appendChild(countElement);
+    const sectionElement = document.getElementById(empresa);
+    if (count > 0) {
+      sectionElement.style.display = 'block';
+      const headerElement = sectionElement.querySelector('.section-header');
+      headerElement.innerHTML += ` <span class="badge bg-secondary">${count}</span>`;
+    } else {
+      sectionElement.style.display = 'none';
+    }
+  });
+
+  // Procesar contratistas
+  processContratistas(contratistasData);
+}
+
+function processContratistas(contratistasData) {
+  const contratistasSection = document.getElementById('contratistas');
+  Object.entries(contratistasData).forEach(([empresa, personas]) => {
+    const empresaElement = document.createElement('div');
+    empresaElement.className = 'empresa-section';
+    empresaElement.innerHTML = `<h4>${empresa}</h4>`;
+    
+    personas.forEach(persona => {
+      const personElement = document.createElement('div');
+      personElement.className = 'person';
+      const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : '🚗';
+      personElement.textContent = `${persona.nombreCompleto}${persona.patente ? ` (${icon} ${persona.patente})` : ''}`;
+      empresaElement.appendChild(personElement);
+    });
+
+    contratistasSection.appendChild(empresaElement);
   });
 }
 
@@ -108,26 +145,11 @@ function updateClock() {
   document.getElementById('date').textContent = dateString;
 }
 
-function loadWeatherData() {
-  fetch(WEATHER_API_URL)
-    .then(response => response.json())
-    .then(data => {
-      const weatherHtml = `
-        <p><i class="fas fa-thermometer-half"></i> Temperatura: ${data.main.temp}°C</p>
-        <p><i class="fas fa-tint"></i> Humedad: ${data.main.humidity}%</p>
-        <p><i class="fas fa-wind"></i> Viento: ${data.wind.speed} m/s</p>
-        <p><i class="fas fa-cloud"></i> Descripción: ${data.weather[0].description}</p>
-      `;
-      document.getElementById('weather-data').innerHTML = weatherHtml;
-    })
-    .catch(error => console.error('Error loading weather data:', error));
-}
-
 function init() {
   loadSheetsData();
   updateClock();
   loadWeatherData();
-  setInterval(loadSheetsData, 100000); // Actualizar datos cada 2 minutos
+  setInterval(loadSheetsData, 100000); // Actualizar datos cada 100 segundos
   setInterval(updateClock, 1000); // Actualizar reloj cada segundo
   setInterval(loadWeatherData, 600000); // Actualizar clima cada 10 minutos
 }
