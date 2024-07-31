@@ -24,9 +24,11 @@ function getWindDirection(degrees) {
 }
 
 function loadSheetsData() {
+  console.log('Iniciando carga de datos...');
   fetch(WEBAPP_URL)
     .then(response => response.json())
     .then(data => {
+      console.log('Datos recibidos:', data);
       processData(data);
     })
     .catch(error => console.error('Error loading data:', error));
