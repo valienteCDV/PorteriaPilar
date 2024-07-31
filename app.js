@@ -58,7 +58,6 @@ function processData(data) {
 
   data.forEach(entry => {
     if (!entry.horaSalida) {  // Solo procesar entradas sin hora de salida
-
       let section;
       if (entry.empresa === 'EPEC BICENTENARIO') {
         section = sections.epecBicentenario;
@@ -89,7 +88,6 @@ function processData(data) {
       }
     }  // Aquí se cierra el if
   });  // Aquí se cierra el forEach
-}
 
   document.getElementById('total-personas').textContent = totalPersonas;
   document.getElementById('total-camiones').textContent = totalCamiones;
@@ -101,7 +99,7 @@ function processData(data) {
     countElement.textContent = `Total: ${count}`;
     sections[empresa].appendChild(countElement);
   });
-
+}
 
 function updateClock() {
   const now = new Date();
