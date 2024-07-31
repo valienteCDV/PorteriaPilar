@@ -101,7 +101,7 @@ function processData(data) {
     countElement.textContent = `Total: ${count}`;
     sections[empresa].appendChild(countElement);
   });
-}
+
 
 function updateClock() {
   const now = new Date();
