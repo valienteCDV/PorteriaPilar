@@ -5,16 +5,24 @@ const API_KEY = 'AIzaSyBhMaVzPTVDlQ5pTNAo3dV0ICmwGZ8o9B4';
 
 // Función para cargar los datos de la hoja de cálculo
 function loadSheetsData() {
+  console.log('Fetching data...');
   fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`)
-    .then(response => response.json())
+    .then(response => {
+      console.log('Response received:', response);
+      return response.json();
+    })
     .then(data => {
+      console.log('Data received:', data);
       if (data.values && data.values.length > 0) {
         processData(data.values);
       } else {
         console.log('No data found.');
       }
     })
-    .catch(error => console.error('Error loading sheet data:', error));
+    .catch(error => {
+      console.error('Error loading sheet data:', error);
+      console.error('Error details:', error.message);
+    });
 }
 
 function processData(data) {
@@ -39,26 +47,7 @@ function processData(data) {
     else if (empresa === 'EPEC EOR') section = sections.epecEor;
     else section = sections.contratistas;
 
-    function loadSheetsData() {
-  console.log('Fetching data...');
-  fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`)
-    .then(response => {
-      console.log('Response received:', response);
-      return response.json();
-    })
-    .then(data => {
-      console.log('Data received:', data);
-      if (data.values && data.values.length > 0) {
-        processData(data.values);
-      } else {
-        console.log('No data found.');
-      }
-    })
-    .catch(error => {
-      console.error('Error loading sheet data:', error);
-      console.error('Error details:', error.message);
-    });
-}
+
     const personElement = document.createElement('div');
     personElement.className = 'person';
     personElement.textContent = nombre;
