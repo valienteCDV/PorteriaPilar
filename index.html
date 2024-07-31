@@ -16,7 +16,7 @@
             color: white;
             padding: 15px 0;
         }
-        .total-personas {
+        .total-personas, .total-camiones {
             background-color: #ffffff;
             border-left: 5px solid #0066cc;
             padding: 15px;
@@ -43,6 +43,7 @@
         .epec-bicentenario .section-header { background-color: #3cb371; }
         .eling .section-header { background-color: #4169e1; }
         .epec-eor .section-header { background-color: #ffd700; }
+        .camiones .section-header { background-color: #ffa500; }
         .person {
             padding: 8px;
             border-bottom: 1px solid #eee;
@@ -69,7 +70,11 @@
 
     <div class="container mt-4">
         <div class="total-personas">
-            <h2 class="mb-0"><i class="fas fa-users"></i> Personas en Planta: <span id="total" class="badge bg-primary">0</span></h2>
+            <h2 class="mb-0"><i class="fas fa-users"></i> Personas en Planta: <span id="total-personas" class="badge bg-primary">0</span></h2>
+        </div>
+
+        <div class="total-camiones">
+            <h2 class="mb-0"><i class="fas fa-truck"></i> Camiones de Gasoil: <span id="total-camiones" class="badge bg-primary">0</span></h2>
         </div>
 
         <div class="row">
@@ -105,10 +110,17 @@
                     <div class="section-content" id="epec-eor"></div>
                 </div>
             </div>
+            <div class="col-md-6 col-lg-3">
+                <div class="section camiones">
+                    <div class="section-header">
+                        <i class="fas fa-truck"></i> CAMIONES DE GASOIL
+                    </div>
+                    <div class="section-content" id="camiones"></div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
