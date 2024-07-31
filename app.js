@@ -14,29 +14,40 @@ function processData(data) {
     contratistas: document.getElementById('contratistas'),
     epecBicentenario: document.getElementById('epec-bicentenario'),
     eling: document.getElementById('eling'),
-    epecEor: document.getElementById('epec-eor')
+    epecEor: document.getElementById('epec-eor'),
+    camiones: document.getElementById('camiones')
   };
-  
+
   // Limpiar contenido existente
   Object.values(sections).forEach(section => section.innerHTML = '');
-  
-  let total = 0;
-  
-  data.forEach(persona => {
-    let section;
-    if (persona.empresa === 'EPEC BICENTENARIO') section = sections.epecBicentenario;
-    else if (persona.empresa === 'ELING') section = sections.eling;
-    else if (persona.empresa === 'EPEC EOR') section = sections.epecEor;
-    else section = sections.contratistas;
 
-    const personElement = document.createElement('div');
-    personElement.className = 'person';
-    personElement.textContent = persona.nombreCompleto + (persona.patente ? ` (🚗 ${persona.patente})` : '');
-    section.appendChild(personElement);
-    total++;
+  let totalPersonas = 0;
+  let totalCamiones = 0;
+
+  data.forEach(entry => {
+    let section;
+    if (entry.tipo === 'persona') {
+      if (entry.empresa === 'EPEC BICENTENARIO') section = sections.epecBicentenario;
+      else if (entry.empresa === 'ELING') section = sections.eling;
+      else if (entry.empresa === 'EPEC EOR') section = sections.epecEor;
+      else section = sections.contratistas;
+
+      const personElement = document.createElement('div');
+      personElement.className = 'person';
+      personElement.textContent = entry.nombreCompleto + (entry.patente ? ` (🚗 ${entry.patente})` : '');
+      section.appendChild(personElement);
+      totalPersonas++;
+    } else if (entry.tipo === 'camion') {
+      const camionElement = document.createElement('div');
+      camionElement.className = 'person';
+      camionElement.textContent = entry.nombreCompleto + (entry.patente ? ` (🚛 ${entry.patente})` : '');
+      sections.camiones.appendChild(camionElement);
+      totalCamiones++;
+    }
   });
 
-  document.getElementById('total').textContent = total;
+  document.getElementById('total-personas').textContent = totalPersonas;
+  document.getElementById('total-camiones').textContent = totalCamiones;
 }
 
 function updateClock() {
