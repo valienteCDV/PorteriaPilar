@@ -1,5 +1,4 @@
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbytUUnWCA3I3JLdLOv8roTMu42qwK709WrJUwrCDYdzxM2tli82PZh7cKv1x3nzOtAT1A/exec';
-
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
 
 function loadWeatherData() {
@@ -22,6 +21,15 @@ function loadWeatherData() {
 function getWindDirection(degrees) {
   const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
   return directions[Math.round(degrees / 45) % 8];
+}
+
+function loadSheetsData() {
+  fetch(WEBAPP_URL)
+    .then(response => response.json())
+    .then(data => {
+      processData(data);
+    })
+    .catch(error => console.error('Error loading data:', error));
 }
 
 function processData(data) {
