@@ -59,35 +59,37 @@ function processData(data) {
   data.forEach(entry => {
     if (!entry.horaSalida) {  // Solo procesar entradas sin hora de salida
 
-    let section;
-    if (entry.empresa === 'EPEC BICENTENARIO') {
-      section = sections.epecBicentenario;
-      personasPorEmpresa.epecBicentenario++;
-    } else if (entry.empresa === 'ELING') {
-      section = sections.eling;
-      personasPorEmpresa.eling++;
-    } else if (entry.empresa === 'EPEC EOR') {
-      section = sections.epecEor;
-      personasPorEmpresa.epecEor++;
-    } else {
-      section = sections.contratistas;
-      personasPorEmpresa.contratistas++;
-    }
+      let section;
+      if (entry.empresa === 'EPEC BICENTENARIO') {
+        section = sections.epecBicentenario;
+        personasPorEmpresa.epecBicentenario++;
+      } else if (entry.empresa === 'ELING') {
+        section = sections.eling;
+        personasPorEmpresa.eling++;
+      } else if (entry.empresa === 'EPEC EOR') {
+        section = sections.epecEor;
+        personasPorEmpresa.epecEor++;
+      } else {
+        section = sections.contratistas;
+        personasPorEmpresa.contratistas++;
+      }
 
-    const personElement = document.createElement('div');
-    personElement.className = 'person';
-    personElement.textContent = `${entry.apellido}, ${entry.nombre}${entry.patente ? ` (🚗 ${entry.patente})` : ''}`;
-    section.appendChild(personElement);
-    totalPersonas++;
+      const personElement = document.createElement('div');
+      personElement.className = 'person';
+      personElement.textContent = `${entry.apellido}, ${entry.nombre}${entry.patente ? ` (🚗 ${entry.patente})` : ''}`;
+      section.appendChild(personElement);
+      totalPersonas++;
 
-    if (entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL') {
-      const camionElement = document.createElement('div');
-      camionElement.className = 'person';
-      camionElement.textContent = `${entry.apellido}, ${entry.nombre} (🚛 ${entry.patente || 'N/A'})`;
-      sections.camiones.appendChild(camionElement);
-      totalCamiones++;
-    }
-  });
+      if (entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL') {
+        const camionElement = document.createElement('div');
+        camionElement.className = 'person';
+        camionElement.textContent = `${entry.apellido}, ${entry.nombre} (🚛 ${entry.patente || 'N/A'})`;
+        sections.camiones.appendChild(camionElement);
+        totalCamiones++;
+      }
+    }  // Aquí se cierra el if
+  });  // Aquí se cierra el forEach
+}
 
   document.getElementById('total-personas').textContent = totalPersonas;
   document.getElementById('total-camiones').textContent = totalCamiones;
