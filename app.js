@@ -1,5 +1,5 @@
 // ID de tu hoja de cálculo
-const SPREADSHEET_ID = '1rHCBn3gEw2S0m4bEqBXX5ZJj6OkMlWGPTR3EgNAcuX0';
+const SPREADSHEET_ID = '1CnNiPEdb-MK8BI08ckAC0iLopSPCDTQlvNQ2EePU0tI';
 const RANGE = 'PersonasAdentro!A:D';
 const API_KEY = 'AIzaSyBhMaVzPTVDlQ5pTNAo3dV0ICmwGZ8o9B4';
 
