@@ -1,28 +1,12 @@
-// ID de tu hoja de cálculo
-const SPREADSHEET_ID = '1CnNiPEdb-MK8BI08ckAC0iLopSPCDTQlvNQ2EePU0tI';
-const RANGE = 'PersonasAdentro!A:D';
-const API_KEY = '81d8b85d5370923b7b8f4b3fd215a8c25d7f4a14';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbytUUnWCA3I3JLdLOv8roTMu42qwK709WrJUwrCDYdzxM2tli82PZh7cKv1x3nzOtAT1A/exec';
 
-// Función para cargar los datos de la hoja de cálculo
 function loadSheetsData() {
-  console.log('Fetching data...');
-  fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${RANGE}?key=${API_KEY}`)
-    .then(response => {
-      console.log('Response received:', response);
-      return response.json();
-    })
+  fetch(WEBAPP_URL)
+    .then(response => response.json())
     .then(data => {
-      console.log('Data received:', data);
-      if (data.values && data.values.length > 0) {
-        processData(data.values);
-      } else {
-        console.log('No data found.');
-      }
+      processData(data);
     })
-    .catch(error => {
-      console.error('Error loading sheet data:', error);
-      console.error('Error details:', error.message);
-    });
+    .catch(error => console.error('Error loading data:', error));
 }
 
 function processData(data) {
@@ -32,34 +16,29 @@ function processData(data) {
     eling: document.getElementById('eling'),
     epecEor: document.getElementById('epec-eor')
   };
-
-  let total = 0;
-
+  
   // Limpiar contenido existente
   Object.values(sections).forEach(section => section.innerHTML = '');
-
-  data.forEach(row => {
-    const [empresa, nombre] = row;
+  
+  let total = 0;
+  
+  data.forEach(persona => {
     let section;
-
-    if (empresa === 'EPEC BICENTENARIO') section = sections.epecBicentenario;
-    else if (empresa === 'ELING') section = sections.eling;
-    else if (empresa === 'EPEC EOR') section = sections.epecEor;
+    if (persona.empresa === 'EPEC BICENTENARIO') section = sections.epecBicentenario;
+    else if (persona.empresa === 'ELING') section = sections.eling;
+    else if (persona.empresa === 'EPEC EOR') section = sections.epecEor;
     else section = sections.contratistas;
-
 
     const personElement = document.createElement('div');
     personElement.className = 'person';
-    personElement.textContent = nombre;
+    personElement.textContent = persona.nombreCompleto + (persona.patente ? ` (🚗 ${persona.patente})` : '');
     section.appendChild(personElement);
-
     total++;
   });
 
   document.getElementById('total').textContent = total;
 }
 
-// Función para actualizar el reloj
 function updateClock() {
   const now = new Date();
   const timeString = now.toLocaleTimeString();
@@ -68,7 +47,6 @@ function updateClock() {
   document.getElementById('date').textContent = dateString;
 }
 
-// Inicializar y actualizar periódicamente
 function init() {
   loadSheetsData();
   updateClock();
@@ -76,5 +54,4 @@ function init() {
   setInterval(updateClock, 1000); // Actualizar reloj cada segundo
 }
 
-// Iniciar la aplicación cuando la página esté cargada
 document.addEventListener('DOMContentLoaded', init);
