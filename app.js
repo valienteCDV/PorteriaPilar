@@ -2,9 +2,11 @@ const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbytUUnWCA3I3JLdLOv8r
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
 
 function loadWeatherData() {
+  console.log('Cargando datos meteorológicos...');
   fetch(WEATHER_API_URL)
     .then(response => response.json())
     .then(data => {
+      console.log('Datos meteorológicos recibidos:', data);
       const currentWeather = data.current_weather;
       const currentHour = new Date().getHours();
       const weatherHtml = `
@@ -35,6 +37,7 @@ function loadSheetsData() {
 }
 
 function processData(data) {
+  console.log('Procesando datos:', data);
   const sections = {
     contratistas: document.getElementById('contratistas'),
     epecBicentenario: document.getElementById('epec-bicentenario'),
