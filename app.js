@@ -108,6 +108,7 @@ function displayContractors(section, contractorsData) {
   });
 
   let totalContractors = 0;
+  section.innerHTML = ''; // Limpiar el contenido existente
   
   Object.entries(contractorsByCompany).forEach(([companyName, personnel]) => {
     const companyElement = document.createElement('div');
