@@ -3,103 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Ingreso Portería Bicentenario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <title>Dashboard Control de Ingreso</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: 'Roboto', sans-serif; background-color: #f8f9fa; }
-        .header { background-color: #0066cc; color: white; padding: 10px 0; }
-        .total-info, .weather-info { background-color: #ffffff; border-left: 5px solid #0066cc; padding: 15px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .section { background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        .section-header { padding: 10px; font-weight: bold; text-align: center; color: white; }
-        .section-content { max-height: 300px; overflow-y: auto; padding: 10px; }
-        .person { font-size: 0.9em; padding: 2px 5px; }
-        .empresa-section { margin-bottom: 10px; }
-        .empresa-section h4 { font-size: 1em; margin-bottom: 5px; border-bottom: 1px solid #eee; }
-        .epec-bicentenario .section-header { background-color: #ACD8AA; }
-        .epec-eor .section-header { background-color: #61C0BF; }
-        .eling .section-header { background-color: #D4A5A5; }
-        .contratistas .section-header { background-color: #ff7f50; }
-        .camiones .section-header { background-color: #ffa500; }
+        body {
+            background-color: #1a202c;
+            color: #ffffff;
+        }
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+        .company-section {
+            background-color: #2d3748;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+        .weather-section {
+            grid-column: span 4;
+            background-color: #2d3748;
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
     </style>
 </head>
-<body>
-    <div class="header">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <h1><i class="fas fa-building"></i> Central Bicentenario</h1>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <div id="clock" class="h4"></div>
-                    <div id="date"></div>
-                </div>
-            </div>
+<body class="p-8">
+    <h1 class="text-4xl font-bold mb-8">Control de Ingreso - Planta Central Eléctrica</h1>
+    
+    <div class="grid-container">
+        <div id="epec-bicentenario" class="company-section">
+            <h2 class="text-2xl font-semibold mb-4">EPEC BICENTENARIO</h2>
+            <ul id="epec-bicentenario-list"></ul>
         </div>
-    </div>
-
-    <div class="container-fluid mt-4">
-        <div class="row">
-            <div class="col-md-8">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="total-info">
-                            <h2 class="mb-0"><i class="fas fa-users"></i> Personas en Planta: <span id="total-personas" class="badge bg-primary">0</span></h2>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="total-info">
-                            <h2 class="mb-0"><i class="fas fa-truck"></i> Camiones de Gasoil: <span id="total-camiones" class="badge bg-primary">0</span></h2>
-                        </div>
-                    </div>
-                </div>
-                <div class="row" id="main-content">
-                    <div class="col-md-6 col-lg-3">
-                        <div class="section epec-bicentenario">
-                            <div class="section-header">
-                                <i class="fas fa-bolt"></i> EPEC BICENTENARIO
-                            </div>
-                            <div class="section-content" id="epec-bicentenario"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <div class="section epec-eor">
-                            <div class="section-header">
-                                <i class="fas fa-cogs"></i> EPEC EOR
-                            </div>
-                            <div class="section-content" id="epec-eor"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <div class="section eling">
-                            <div class="section-header">
-                                <i class="fas fa-industry"></i> ELING
-                            </div>
-                            <div class="section-content" id="eling"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <div class="section contratistas">
-                            <div class="section-header">
-                                <i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS
-                            </div>
-                            <div class="section-content" id="contratistas"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="weather-info">
-                    <h2><i class="fas fa-cloud-sun"></i> Clima en Pilar, Córdoba</h2>
-                    <div id="weather-data"></div>
-                </div>
-                <div class="section camiones">
-                    <div class="section-header">
-                        <i class="fas fa-truck"></i> CAMIONES DE GASOIL
-                    </div>
-                    <div class="section-content" id="camiones"></div>
-                </div>
-            </div>
+        
+        <div id="eling" class="company-section">
+            <h2 class="text-2xl font-semibold mb-4">ELING</h2>
+            <ul id="eling-list"></ul>
+        </div>
+        
+        <div id="epec-eor" class="company-section">
+            <h2 class="text-2xl font-semibold mb-4">EPEC EOR</h2>
+            <ul id="epec-eor-list"></ul>
+        </div>
+        
+        <div id="others" class="company-section">
+            <h2 class="text-2xl font-semibold mb-4">Otras Empresas</h2>
+            <ul id="others-list"></ul>
+        </div>
+        
+        <div id="weather" class="weather-section">
+            <h2 class="text-2xl font-semibold mb-4">Información Meteorológica</h2>
+            <div id="weather-data" class="grid grid-cols-4 gap-4"></div>
         </div>
     </div>
 
