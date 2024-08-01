@@ -46,50 +46,89 @@ function processData(data) {
 
   const sections = {
     epecBicentenario: document.querySelector('#epec-bicentenario .section-content'),
-    epecEor: document.querySelector('#epec-eor .section-content'),
     eling: document.querySelector('#eling .section-content'),
-    contratistas: document.querySelector('#contratistas .section-content')
+    otherCompanies: document.querySelector('#other-companies .section-content')
   };
+
+  // Verificar que todos los elementos existan
+  for (const [key, element] of Object.entries(sections)) {
+    if (!element) {
+      console.error(`Elemento no encontrado: ${key}`);
+      return;
+    }
+  }
 
   // Limpiar contenido existente
   Object.values(sections).forEach(section => section.innerHTML = '');
 
   let totalPersonas = 0;
   let totalCamiones = 0;
+  let companyData = {
+    epecBicentenario: { count: 0, personas: [] },
+    eling: { count: 0, personas: [] },
+    others: {}
+  };
 
   data.empresas.forEach(empresa => {
-    let section = sections[getCompanySection(empresa.nombre)];
-    
-    empresa.personas.sort((a, b) => a.nombre.localeCompare(b.nombre));
-    
-    if (empresa.nombre !== 'CONTRATISTAS Y VISITAS') {
-      displayCompanyPersonnel(section, empresa);
-    } else {
-      displayContractors(section, empresa);
+    if (empresa && typeof empresa.cantidad === 'number') {
+      totalPersonas += empresa.cantidad;
     }
+    if (empresa.personas && Array.isArray(empresa.personas)) {
+      totalCamiones += empresa.personas.filter(p => p.carga && p.carga.toString().toUpperCase().trim() === 'GASOIL').length;
 
-    const headerElement = section.closest('.section').querySelector('.section-header');
-    headerElement.innerHTML = `${headerElement.innerHTML.split('<span')[0]} <span class="badge bg-secondary">${empresa.cantidad}</span>`;
-
-    totalPersonas += empresa.cantidad;
-    totalCamiones += empresa.personas.filter(p => p.carga && p.carga.toString().toUpperCase().trim() === 'GASOIL').length;
+      if (empresa.nombre === 'EPEC BICENTENARIO') {
+        companyData.epecBicentenario.count = empresa.cantidad;
+        companyData.epecBicentenario.personas = empresa.personas;
+      } else if (empresa.nombre === 'ELING') {
+        companyData.eling.count = empresa.cantidad;
+        companyData.eling.personas = empresa.personas;
+      } else {
+        companyData.others[empresa.nombre] = {
+          count: empresa.cantidad,
+          personas: empresa.personas
+        };
+      }
+    }
   });
 
-  document.getElementById('total-personas').textContent = totalPersonas;
-  document.getElementById('total-camiones').textContent = totalCamiones;
+  // Mostrar EPEC BICENTENARIO
+  displayCompanyPersonnel(sections.epecBicentenario, companyData.epecBicentenario.personas);
+  updateSectionHeader('epec-bicentenario', companyData.epecBicentenario.count, totalPersonas);
+
+  // Mostrar ELING
+  displayCompanyPersonnel(sections.eling, companyData.eling.personas);
+  updateSectionHeader('eling', companyData.eling.count, totalPersonas);
+
+  // Mostrar otras empresas
+  let otherCompaniesCount = 0;
+  Object.entries(companyData.others).forEach(([companyName, company]) => {
+    const companyCard = createCompanyCard(companyName, company.personas);
+    sections.otherCompanies.appendChild(companyCard);
+    otherCompaniesCount += company.count;
+  });
+  updateSectionHeader('other-companies', otherCompaniesCount, totalPersonas);
+
+  const totalPersonasElement = document.getElementById('total-personas');
+  if (totalPersonasElement) totalPersonasElement.textContent = totalPersonas;
+
+  const totalCamionesElement = document.getElementById('total-camiones');
+  if (totalCamionesElement) totalCamionesElement.textContent = totalCamiones;
 }
 
-function getCompanySection(companyName) {
-  switch(companyName) {
-    case 'EPEC BICENTENARIO': return 'epecBicentenario';
-    case 'EPEC EOR': return 'epecEor';
-    case 'ELING': return 'eling';
-    default: return 'contratistas';
+function updateSectionHeader(sectionId, count, total) {
+  const headerElement = document.querySelector(`#${sectionId} .section-header .badge`);
+  if (headerElement) {
+    const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+    headerElement.textContent = `${count} (${percentage}%)`;
   }
 }
 
-function displayCompanyPersonnel(section, company) {
-  company.personas.forEach((persona, index) => {
+
+function displayCompanyPersonnel(section, personas) {
+  if (!section || !Array.isArray(personas)) return;
+
+  personas.sort((a, b) => a.nombre.localeCompare(b.nombre));
+  personas.forEach((persona, index) => {
     const personElement = document.createElement('div');
     personElement.className = 'person';
     const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
@@ -98,38 +137,24 @@ function displayCompanyPersonnel(section, company) {
   });
 }
 
-function displayContractors(section, contractorsData) {
-  const contractorsByCompany = {};
-  contractorsData.personas.forEach(persona => {
-    if (!contractorsByCompany[persona.empresa]) {
-      contractorsByCompany[persona.empresa] = [];
-    }
-    contractorsByCompany[persona.empresa].push(persona);
-  });
+function createCompanyCard(companyName, personas) {
+  if (!companyName || !Array.isArray(personas)) return null;
 
-  let totalContractors = 0;
-  section.innerHTML = ''; // Limpiar el contenido existente
+  const card = document.createElement('div');
+  card.className = 'company-card';
+  card.innerHTML = `<h3>${companyName} <span class="badge bg-secondary">${personas.length}</span></h3>`;
   
-  Object.entries(contractorsByCompany).forEach(([companyName, personnel]) => {
-    const companyElement = document.createElement('div');
-    companyElement.className = 'contractor-company';
-    
-    const companyHeader = document.createElement('div');
-    companyHeader.className = 'company-header';
-    companyHeader.textContent = companyName;
-    companyElement.appendChild(companyHeader);
-
-    personnel.forEach((persona, index) => {
-      const personElement = document.createElement('div');
-      personElement.className = 'person';
-      const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
-      personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
-      companyElement.appendChild(personElement);
-    });
-    
-    totalContractors += personnel.length;
-    section.appendChild(companyElement);
+  personas.sort((a, b) => a.nombre.localeCompare(b.nombre));
+  personas.forEach((persona, index) => {
+    const personElement = document.createElement('div');
+    personElement.className = 'person';
+    const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
+    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
+    card.appendChild(personElement);
   });
+
+  return card;
+}
 
   // Actualizar el contador en el encabezado de la sección
   const headerElement = section.closest('.section').querySelector('.section-header');
