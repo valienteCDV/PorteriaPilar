@@ -2,13 +2,7 @@
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
 
 // URL de tu API de Google Apps Script (reemplaza con tu URL real)
-const DATA_API_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=PCBa-ffSxSQKmieu-aKlH_Q3lInnZ4HFW-Qk_416RBPpqixGN3pZFyvVJcWVzmSKi5AyhJbsyEPc3WmDKlZ_hOufBr1xtivdm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnP4c9KToyw9YW6L56xXAJSipg1vKsN4HEjr0RUCJdnL_QlGwKAOjS4mazvbz4uUOtWCcL6933RJVAWBjFNo5rHZ3AXleNoPCNNz9Jw9Md8uu&lib=MCd94xyADNjRlrDad36TLIUfIMEvM9E86';
-
-// URL de la API del clima
-const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
-
-// URL de tu API de Google Apps Script (reemplaza con tu URL real)
-const DATA_API_URL = 'https://script.google.com/macros/s/TU_ID_DE_IMPLEMENTACION/exec';
+const DATA_API_URL = 'https://script.google.com/macros/s/AKfycbx0G-MiPCDJRmVybfe6Xz70NJVPb3K3NHPcHz3DpGPbVfd8q2tTWZU_PU3Gv01ODbRVKA/exec';
 
 // Función para cargar los datos del dashboard
 function loadDashboardData() {
