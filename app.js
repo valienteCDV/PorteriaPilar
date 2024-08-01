@@ -1,170 +1,208 @@
-const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbx0G-MiPCDJRmVybfe6Xz70NJVPb3K3NHPcHz3DpGPbVfd8q2tTWZU_PU3Gv01ODbRVKA/exec';
-const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Ingreso Portería Bicentenario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Estilos generales */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+        }
+        .dashboard-container {
+            padding: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+        
+        /* Estilos para los paneles de información */
+        .info-panel {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .info-panel:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .info-panel h2 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            color: #0066cc;
+        }
+        
+        /* Estilos para las secciones de personal */
+        .section {
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            height: calc(100% - 20px);
+            transition: all 0.3s ease;
+        }
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .section-header {
+            padding: 15px;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+        .section-content {
+            padding: 15px;
+            overflow-y: auto;
+            max-height: calc(100vh - 250px);
+        }
+        
+        /* Colores para los encabezados de cada sección */
+        .contratistas .section-header { background-color: #ff7f50; }
+        .epec-bicentenario .section-header { background-color: #3cb371; }
+        .eling .section-header { background-color: #4169e1; }
+        .epec-eor .section-header { background-color: #ffd700; }
+        
+        /* Estilos para las entradas de personal */
+        .person {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+        .person:last-child {
+            border-bottom: none;
+        }
+        
+        /* Estilos para las empresas contratistas */
+        .contractor-company {
+            margin-bottom: 15px;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .contractor-company h4 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 5px;
+            color: #495057;
+        }
+        
+        /* Estilos para el reloj y el clima */
+        #clock {
+            font-size: 2.5rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        #weather-data {
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Estilos para los días sin accidentes */
+        #days-without-accidents {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        /* Estilos adicionales */
+        .badge {
+            font-size: 1rem;
+            padding: 5px 10px;
+        }
+        .weather-icon {
+            font-size: 1.5rem;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Fila superior con información general -->
+        <div class="row g-3">
+            <!-- Panel de Personas en Planta -->
+            <div class="col-md-3">
+                <div class="info-panel">
+                    <h2><i class="fas fa-users"></i> Personas en Planta</h2>
+                    <span id="total-personas" class="badge bg-primary">0</span>
+                </div>
+            </div>
+            <!-- Panel de Camiones de Gasoil -->
+            <div class="col-md-3">
+                <div class="info-panel">
+                    <h2><i class="fas fa-truck"></i> Camiones de Gasoil</h2>
+                    <span id="total-camiones" class="badge bg-success">0</span>
+                </div>
+            </div>
+            <!-- Panel de Reloj y Clima -->
+            <div class="col-md-3">
+                <div class="info-panel">
+                    <div id="clock"></div>
+                    <div id="weather-data"></div>
+                </div>
+            </div>
+            <!-- Panel de Días sin accidentes -->
+            <div class="col-md-3">
+                <div class="info-panel text-center">
+                    <h2>Días sin accidentes</h2>
+                    <div id="days-without-accidents"></div>
+                    <small id="last-accident-date"></small>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Fila inferior con secciones de personal -->
+        <div class="row g-3 mt-2">
+            <!-- Sección de Contratistas y Visitas -->
+            <div class="col-md-3">
+                <div class="section contratistas" id="contratistas">
+                    <div class="section-header">
+                        <i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS
+                    </div>
+                    <div class="section-content"></div>
+                </div>
+            </div>
+            <!-- Sección de EPEC BICENTENARIO -->
+            <div class="col-md-3">
+                <div class="section epec-bicentenario" id="epec-bicentenario">
+                    <div class="section-header">
+                        <i class="fas fa-bolt"></i> EPEC BICENTENARIO
+                    </div>
+                    <div class="section-content"></div>
+                </div>
+            </div>
+            <!-- Sección de ELING -->
+            <div class="col-md-3">
+                <div class="section eling" id="eling">
+                    <div class="section-header">
+                        <i class="fas fa-industry"></i> ELING
+                    </div>
+                    <div class="section-content"></div>
+                </div>
+            </div>
+            <!-- Sección de EPEC EOR -->
+            <div class="col-md-3">
+                <div class="section epec-eor" id="epec-eor">
+                    <div class="section-header">
+                        <i class="fas fa-cogs"></i> EPEC EOR
+                    </div>
+                    <div class="section-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-function loadWeatherData() {
-  fetch(WEATHER_API_URL)
-    .then(response => response.json())
-    .then(data => {
-      const currentWeather = data.current_weather;
-      const currentHour = new Date().getHours();
-      updateWeatherDisplay(currentWeather, data.hourly.relativehumidity_2m[currentHour]);
-    })
-    .catch(error => console.error('Error loading weather data:', error));
-}
-
-function updateWeatherDisplay(weather, humidity) {
-  const weatherHtml = `
-    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C</div>
-    <div><span class="weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
-    <div><span class="weather-icon"><i class="fas fa-wind"></i></span>${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h</div>
-  `;
-  document.getElementById('weather-data').innerHTML = weatherHtml;
-}
-
-function getWindDirection(degrees) {
-  const directions = ['Norte', 'NorEste', 'Este', 'SudEste', 'Sur', 'SudOeste', 'Oeste', 'NorOeste'];
-  return directions[Math.round(degrees / 45) % 8];
-}
-
-function loadSheetsData() {
-  console.log('Iniciando carga de datos...');
-  fetch(WEBAPP_URL)
-    .then(response => response.json())
-    .then(data => {
-      console.log('Datos recibidos:', data);
-      processData(data);
-    })
-    .catch(error => console.error('Error loading data:', error));
-}
-
-function processData(data) {
-  console.log('Procesando datos:', data);
-  if (!data || !data.empresas || !Array.isArray(data.empresas)) {
-    console.error('Formato de datos inválido:', data);
-    return;
-  }
-
-  const sections = {
-    epecBicentenario: document.querySelector('#epec-bicentenario .section-content'),
-    epecEor: document.querySelector('#epec-eor .section-content'),
-    eling: document.querySelector('#eling .section-content'),
-    contratistas: document.querySelector('#contratistas .section-content')
-  };
-
-  // Limpiar contenido existente
-  Object.values(sections).forEach(section => section.innerHTML = '');
-
-  let totalPersonas = 0;
-  let totalCamiones = 0;
-
-  data.empresas.forEach(empresa => {
-    let section = sections[getCompanySection(empresa.nombre)];
-    
-    empresa.personas.sort((a, b) => a.nombre.localeCompare(b.nombre));
-    
-    if (empresa.nombre !== 'CONTRATISTAS Y VISITAS') {
-      displayCompanyPersonnel(section, empresa);
-    } else {
-      displayContractors(section, empresa);
-    }
-
-    const headerElement = section.closest('.section').querySelector('.section-header');
-    headerElement.innerHTML = `${headerElement.innerHTML.split('<span')[0]} <span class="badge bg-secondary">${empresa.cantidad}</span>`;
-
-    totalPersonas += empresa.cantidad;
-    totalCamiones += empresa.personas.filter(p => p.carga && p.carga.toString().toUpperCase().trim() === 'GASOIL').length;
-  });
-
-  document.getElementById('total-personas').textContent = totalPersonas;
-  document.getElementById('total-camiones').textContent = totalCamiones;
-}
-
-function getCompanySection(companyName) {
-  switch(companyName) {
-    case 'EPEC BICENTENARIO': return 'epecBicentenario';
-    case 'EPEC EOR': return 'epecEor';
-    case 'ELING': return 'eling';
-    default: return 'contratistas';
-  }
-}
-
-function displayCompanyPersonnel(section, company) {
-  company.personas.forEach((persona, index) => {
-    const personElement = document.createElement('div');
-    personElement.className = 'person';
-    const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
-    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
-    section.appendChild(personElement);
-  });
-}
-
-function displayContractors(section, contractorsData) {
-  const contractorsByCompany = {};
-  contractorsData.personas.forEach(persona => {
-    if (!contractorsByCompany[persona.empresa]) {
-      contractorsByCompany[persona.empresa] = [];
-    }
-    contractorsByCompany[persona.empresa].push(persona);
-  });
-
-  let totalContractors = 0;
-  section.innerHTML = ''; // Limpiar el contenido existente
-  
-  Object.entries(contractorsByCompany).forEach(([companyName, personnel]) => {
-    const companyElement = document.createElement('div');
-    companyElement.className = 'contractor-company';
-    
-    const companyHeader = document.createElement('div');
-    companyHeader.className = 'company-header';
-    companyHeader.textContent = companyName;
-    companyElement.appendChild(companyHeader);
-
-    personnel.forEach((persona, index) => {
-      const personElement = document.createElement('div');
-      personElement.className = 'person';
-      const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
-      personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
-      companyElement.appendChild(personElement);
-    });
-    
-    totalContractors += personnel.length;
-    section.appendChild(companyElement);
-  });
-
-  // Actualizar el contador en el encabezado de la sección
-  const headerElement = section.closest('.section').querySelector('.section-header');
-  headerElement.innerHTML = `<i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS <span class="badge bg-secondary">${totalContractors}</span>`;
-}
-
-function getRandomPastelColor() {
-  const hue = Math.floor(Math.random() * 360);
-  return `hsla(${hue}, 100%, 85%, 0.3)`;
-}
-
-function updateClock() {
-  const now = new Date();
-  const timeString = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  document.getElementById('clock').textContent = timeString;
-}
-
-function updateSafetyCalendar() {
-  const lastAccidentDate = new Date('2019-12-17');
-  const today = new Date();
-  const daysSinceLastAccident = Math.floor((today - lastAccidentDate) / (1000 * 60 * 60 * 24));
-  
-  document.getElementById('days-without-accidents').textContent = daysSinceLastAccident;
-  document.getElementById('last-accident-date').textContent = `Último accidente: 17/12/2019`;
-}
-
-function init() {
-  loadSheetsData();
-  updateClock();
-  loadWeatherData();
-  updateSafetyCalendar();
-  setInterval(loadSheetsData, 100000); // Actualizar datos cada 100 segundos
-  setInterval(updateClock, 1000); // Actualizar reloj cada segundo
-  setInterval(loadWeatherData, 600000); // Actualizar clima cada 10 minutos
-  setInterval(updateSafetyCalendar, 86400000); // Actualizar calendario de seguridad cada día
-}
-
-document.addEventListener('DOMContentLoaded', init);
+    <script src="app.js"></script>
+</body>
+</html>
