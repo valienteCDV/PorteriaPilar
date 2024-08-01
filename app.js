@@ -156,16 +156,6 @@ function createCompanyCard(companyName, personas) {
   return card;
 }
 
-  // Actualizar el contador en el encabezado de la sección
-  const headerElement = section.closest('.section').querySelector('.section-header');
-  headerElement.innerHTML = `<i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS <span class="badge bg-secondary">${totalContractors}</span>`;
-}
-
-function getRandomPastelColor() {
-  const hue = Math.floor(Math.random() * 360);
-  return `hsla(${hue}, 100%, 85%, 0.3)`;
-}
-
 function updateClock() {
   const now = new Date();
   const timeString = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
