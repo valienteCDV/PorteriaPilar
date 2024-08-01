@@ -1,6 +1,10 @@
+// URLs para las APIs
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbx0G-MiPCDJRmVybfe6Xz70NJVPb3K3NHPcHz3DpGPbVfd8q2tTWZU_PU3Gv01ODbRVKA/exec';
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
 
+/**
+ * Carga los datos meteorológicos de la API
+ */
 function loadWeatherData() {
   fetch(WEATHER_API_URL)
     .then(response => response.json())
@@ -12,6 +16,11 @@ function loadWeatherData() {
     .catch(error => console.error('Error loading weather data:', error));
 }
 
+/**
+ * Actualiza la visualización del clima en el dashboard
+ * @param {Object} weather - Datos del clima actual
+ * @param {number} humidity - Humedad actual
+ */
 function updateWeatherDisplay(weather, humidity) {
   const weatherHtml = `
     <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C</div>
@@ -21,11 +30,19 @@ function updateWeatherDisplay(weather, humidity) {
   document.getElementById('weather-data').innerHTML = weatherHtml;
 }
 
+/**
+ * Obtiene la dirección del viento basada en los grados
+ * @param {number} degrees - Grados de dirección del viento
+ * @returns {string} Dirección del viento en texto
+ */
 function getWindDirection(degrees) {
   const directions = ['Norte', 'NorEste', 'Este', 'SudEste', 'Sur', 'SudOeste', 'Oeste', 'NorOeste'];
   return directions[Math.round(degrees / 45) % 8];
 }
 
+/**
+ * Carga los datos de la hoja de cálculo desde la API de Google Apps Script
+ */
 function loadSheetsData() {
   console.log('Iniciando carga de datos...');
   fetch(WEBAPP_URL)
@@ -37,6 +54,10 @@ function loadSheetsData() {
     .catch(error => console.error('Error loading data:', error));
 }
 
+/**
+ * Procesa los datos recibidos y actualiza el dashboard
+ * @param {Object} data - Datos recibidos de la API
+ */
 function processData(data) {
   console.log('Procesando datos:', data);
   if (!data || !data.empresas || !Array.isArray(data.empresas)) {
@@ -69,6 +90,7 @@ function processData(data) {
     others: {}
   };
 
+  // Procesar datos de cada empresa
   data.empresas.forEach(empresa => {
     if (empresa && typeof empresa.cantidad === 'number') {
       totalPersonas += empresa.cantidad;
@@ -91,15 +113,13 @@ function processData(data) {
     }
   });
 
-  // Mostrar EPEC BICENTENARIO
+  // Mostrar datos de cada empresa
   displayCompanyPersonnel(sections.epecBicentenario, companyData.epecBicentenario.personas);
   updateSectionHeader('epec-bicentenario', companyData.epecBicentenario.count, totalPersonas);
 
-  // Mostrar ELING
   displayCompanyPersonnel(sections.eling, companyData.eling.personas);
   updateSectionHeader('eling', companyData.eling.count, totalPersonas);
 
-  // Mostrar otras empresas
   let otherCompaniesCount = 0;
   Object.entries(companyData.others).forEach(([companyName, company]) => {
     const companyCard = createCompanyCard(companyName, company.personas);
@@ -108,13 +128,20 @@ function processData(data) {
   });
   updateSectionHeader('other-companies', otherCompaniesCount, totalPersonas);
 
-  const totalPersonasElement = document.getElementById('total-personas');
-  if (totalPersonasElement) totalPersonasElement.textContent = totalPersonas;
+  // Actualizar totales
+  document.getElementById('total-personas').textContent = totalPersonas;
+  document.getElementById('total-camiones').textContent = totalCamiones;
 
-  const totalCamionesElement = document.getElementById('total-camiones');
-  if (totalCamionesElement) totalCamionesElement.textContent = totalCamiones;
+  // Actualizar tiempo de última actualización
+  updateLastUpdateTime();
 }
 
+/**
+ * Actualiza el encabezado de una sección con el conteo y porcentaje
+ * @param {string} sectionId - ID de la sección a actualizar
+ * @param {number} count - Cantidad de personas en la sección
+ * @param {number} total - Total de personas en todas las secciones
+ */
 function updateSectionHeader(sectionId, count, total) {
   const headerElement = document.querySelector(`#${sectionId} .section-header .badge`);
   if (headerElement) {
@@ -123,7 +150,11 @@ function updateSectionHeader(sectionId, count, total) {
   }
 }
 
-
+/**
+ * Muestra el personal de una empresa en su sección correspondiente
+ * @param {HTMLElement} section - Elemento donde mostrar el personal
+ * @param {Array} personas - Array de personas a mostrar
+ */
 function displayCompanyPersonnel(section, personas) {
   if (!section || !Array.isArray(personas)) return;
 
@@ -137,6 +168,12 @@ function displayCompanyPersonnel(section, personas) {
   });
 }
 
+/**
+ * Crea una tarjeta para una empresa en la sección "Otros"
+ * @param {string} companyName - Nombre de la empresa
+ * @param {Array} personas - Array de personas de la empresa
+ * @returns {HTMLElement} Elemento de tarjeta de empresa
+ */
 function createCompanyCard(companyName, personas) {
   if (!companyName || !Array.isArray(personas)) return null;
 
@@ -156,14 +193,25 @@ function createCompanyCard(companyName, personas) {
   return card;
 }
 
-// Actualizar la hora y la fecha de última actualización
+/**
+ * Actualiza el reloj y la fecha de última actualización
+ */
 function updateClock() {
     const now = new Date();
     document.getElementById('clock').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+}
+
+/**
+ * Actualiza la hora de la última actualización de datos
+ */
+function updateLastUpdateTime() {
+    const now = new Date();
     document.getElementById('update-time').textContent = now.toLocaleString('es-AR');
 }
 
-// Actualizar el calendario de accidentes
+/**
+ * Actualiza el calendario de accidentes
+ */
 function updateAccidentCalendar() {
     const lastAccidentDate = new Date('2019-12-17');
     const today = new Date();
@@ -176,33 +224,19 @@ function updateAccidentCalendar() {
     // Por ahora, solo mostraremos el número de días
 }
 
-// Actualizar la sección de otras empresas
-function updateOtherCompanies(companies) {
-    const container = document.querySelector('#other-companies .section-content');
-    container.innerHTML = '';
-    
-    companies.forEach(company => {
-        const card = document.createElement('div');
-        card.className = 'company-card';
-        card.innerHTML = `
-            <h3>${company.name}</h3>
-            ${company.personnel.map((person, index) => `
-                <div class="person">
-                    ${index + 1}. ${person.name}${person.vehicle ? ` (${person.vehicle})` : ''}
-                </div>
-            `).join('')}
-        `;
-        container.appendChild(card);
-    });
-}
-
-// Inicialización y actualizaciones periódicas
+/**
+ * Inicializa la aplicación y configura las actualizaciones periódicas
+ */
 function init() {
     updateClock();
     updateAccidentCalendar();
-    loadData(); // Asume que esta función carga los datos de personal y empresas
+    loadWeatherData();
+    loadSheetsData();
     setInterval(updateClock, 1000);
-    setInterval(loadData, 300000); // Actualizar datos cada 5 minutos
+    setInterval(loadWeatherData, 600000); // Cada 10 minutos
+    setInterval(loadSheetsData, 300000); // Cada 5 minutos
+    setInterval(updateAccidentCalendar, 86400000); // Cada día
 }
 
+// Iniciar la aplicación cuando el DOM esté completamente cargado
 document.addEventListener('DOMContentLoaded', init);
