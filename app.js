@@ -45,7 +45,10 @@ function processData(data) {
   };
 
   // Limpiar contenido existente
-  Object.values(sections).forEach(section => section.innerHTML = '');
+  Object.values(sections).forEach(section => {
+    section.innerHTML = '';
+    section.closest('.section').style.display = 'none';
+  });
 
   let totalPersonas = 0;
   let totalCamiones = 0;
@@ -106,16 +109,23 @@ function processData(data) {
   Object.entries(personasPorEmpresa).forEach(([empresa, count]) => {
     const sectionElement = document.getElementById(empresa);
     if (count > 0) {
-      sectionElement.style.display = 'block';
-      const headerElement = sectionElement.querySelector('.section-header');
+      sectionElement.closest('.section').style.display = 'block';
+      const headerElement = sectionElement.closest('.section').querySelector('.section-header');
       headerElement.innerHTML += ` <span class="badge bg-secondary">${count}</span>`;
-    } else {
-      sectionElement.style.display = 'none';
     }
   });
 
   // Procesar contratistas
-  processContratistas(contratistasData);
+  if (personasPorEmpresa.contratistas > 0) {
+    processContratistas(contratistasData);
+    sections.contratistas.closest('.section').style.display = 'block';
+  }
+
+  // Mostrar/ocultar sección de camiones
+  sections.camiones.closest('.section').style.display = totalCamiones > 0 ? 'block' : 'none';
+
+  // Ajustar el layout si algunas secciones están ocultas
+  adjustLayout();
 }
 
 function processContratistas(contratistasData) {
@@ -137,6 +147,24 @@ function processContratistas(contratistasData) {
   });
 }
 
+function adjustLayout() {
+  const mainContent = document.getElementById('main-content');
+  const visibleSections = mainContent.querySelectorAll('.section[style="display: block;"]');
+  
+  visibleSections.forEach(section => {
+    section.classList.remove('col-md-6', 'col-lg-3');
+    if (visibleSections.length === 3) {
+      section.classList.add('col-md-4');
+    } else if (visibleSections.length === 2) {
+      section.classList.add('col-md-6');
+    } else if (visibleSections.length === 1) {
+      section.classList.add('col-md-12');
+    } else {
+      section.classList.add('col-md-6', 'col-lg-3');
+    }
+  });
+}
+
 function updateClock() {
   const now = new Date();
   const timeString = now.toLocaleTimeString();
@@ -153,5 +181,6 @@ function init() {
   setInterval(updateClock, 1000); // Actualizar reloj cada segundo
   setInterval(loadWeatherData, 600000); // Actualizar clima cada 10 minutos
 }
+
 
 document.addEventListener('DOMContentLoaded', init);
