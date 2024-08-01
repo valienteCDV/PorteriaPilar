@@ -36,6 +36,11 @@ function loadSheetsData() {
 
 function processData(data) {
   console.log('Procesando datos:', data);
+  if (!data || !data.empresas || !Array.isArray(data.empresas)) {
+    console.error('Formato de datos inválido:', data);
+    return;
+  }
+
   const sections = {
     epecBicentenario: document.querySelector('#epec-bicentenario .section-content'),
     epecEor: document.querySelector('#epec-eor .section-content'),
@@ -48,86 +53,44 @@ function processData(data) {
 
   let totalPersonas = 0;
   let totalCamiones = 0;
-  let personasPorEmpresa = {
-    epecBicentenario: 0,
-    epecEor: 0,
-    eling: 0,
-    contratistas: 0
-  };
 
-  let contratistasData = {};
-
-  data.forEach(entry => {
+  data.empresas.forEach(empresa => {
     let section;
-    if (entry.empresa === 'EPEC BICENTENARIO') {
-      section = sections.epecBicentenario;
-      personasPorEmpresa.epecBicentenario++;
-    } else if (entry.empresa === 'EPEC EOR') {
-      section = sections.epecEor;
-      personasPorEmpresa.epecEor++;
-    } else if (entry.empresa === 'ELING') {
-      section = sections.eling;
-      personasPorEmpresa.eling++;
-    } else {
-      section = sections.contratistas;
-      personasPorEmpresa.contratistas++;
-      if (!contratistasData[entry.empresa]) {
-        contratistasData[entry.empresa] = [];
-      }
-      contratistasData[entry.empresa].push(entry);
+    switch(empresa.nombre) {
+      case 'EPEC BICENTENARIO':
+        section = sections.epecBicentenario;
+        break;
+      case 'EPEC EOR':
+        section = sections.epecEor;
+        break;
+      case 'ELING':
+        section = sections.eling;
+        break;
+      default:
+        section = sections.contratistas;
     }
 
-    if (section !== sections.contratistas) {
+    const headerElement = section.closest('.section').querySelector('.section-header');
+    headerElement.innerHTML = `${headerElement.innerHTML.split('<span')[0]} <span class="badge bg-secondary">${empresa.cantidad}</span>`;
+
+    empresa.personas.forEach(persona => {
       const personElement = document.createElement('div');
       personElement.className = 'person';
-      const icon = entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (entry.patente ? '🚗' : '👤');
-      personElement.textContent = `${icon} ${entry.nombreCompleto}${entry.patente ? ` (${entry.patente})` : ''}`;
+      const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '👤');
+      personElement.textContent = `${icon} ${persona.nombre}${persona.patente ? ` (${persona.patente})` : ''}`;
       section.appendChild(personElement);
-    }
 
-    totalPersonas++;
+      if (persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL') {
+        totalCamiones++;
+      }
+    });
 
-    if (entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL') {
-      totalCamiones++;
-    }
+    totalPersonas += empresa.cantidad;
   });
 
   document.getElementById('total-personas').textContent = totalPersonas;
   document.getElementById('total-camiones').textContent = totalCamiones;
-
-  // Actualizar contadores por empresa y mostrar/ocultar secciones
-  Object.entries(personasPorEmpresa).forEach(([empresa, count]) => {
-    const sectionElement = document.getElementById(empresa.replace('epec', 'epec-'));
-    if (count > 0) {
-      sectionElement.style.display = 'block';
-      const headerElement = sectionElement.querySelector('.section-header');
-      headerElement.innerHTML = headerElement.innerHTML.split('<span')[0] + ` <span class="badge bg-secondary">${count}</span>`;
-    } else {
-      sectionElement.style.display = 'none';
-    }
-  });
-
-  // Procesar contratistas
-  processContratistas(contratistasData);
-}
-
-function processContratistas(contratistasData) {
-  const contratistasSection = document.querySelector('#contratistas .section-content');
-  Object.entries(contratistasData).forEach(([empresa, personas]) => {
-    const empresaElement = document.createElement('div');
-    empresaElement.className = 'empresa-section';
-    empresaElement.innerHTML = `<h4>${empresa}</h4>`;
-    
-    personas.forEach(persona => {
-      const personElement = document.createElement('div');
-      personElement.className = 'person';
-      const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '👤');
-      personElement.textContent = `${icon} ${persona.nombreCompleto}${persona.patente ? ` (${persona.patente})` : ''}`;
-      empresaElement.appendChild(personElement);
-    });
-
-    contratistasSection.appendChild(empresaElement);
-  });
+  document.getElementById('camionesGasoil').textContent = totalCamiones;
 }
 
 function updateClock() {
