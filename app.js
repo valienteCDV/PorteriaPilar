@@ -1,148 +1,145 @@
-// URL de la API del clima
+const WEBAPP_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=T1T-Ksn1Vk-4SeKNOOkV8UInWaia9cX-M5A7IenztLnfxm6Fh9TNCKj-Ok3K2z5F5SAwStyVzMSn0xsCH5C3duX_exObaDkCm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnP4c9KToyw9YW6L56xXAJSipg1vKsN4HEjr0RUCJdnL_QlGwKAOjS4mazvbz4uUOtWCcL6933RJVAWBjFNo5rHZ3AXleNoPCNNz9Jw9Md8uu&lib=MCd94xyADNjRlrDad36TLIUfIMEvM9E86';
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
 
-// URL de tu API de Google Apps Script (reemplaza con tu URL real)
-const DATA_API_URL = 'https://script.google.com/macros/s/AKfycbx0G-MiPCDJRmVybfe6Xz70NJVPb3K3NHPcHz3DpGPbVfd8q2tTWZU_PU3Gv01ODbRVKA/exec';
-
-// Función para cargar los datos del dashboard
-function loadDashboardData() {
-    fetch(DATA_API_URL)
-        .then(response => response.json())
-        .then(data => {
-            console.log('Datos recibidos:', data); // Para depuración
-
-            document.getElementById('totalPersonas').textContent = data.totalPersonas;
-            document.getElementById('camionesGasoil').textContent = data.camionesGasoil;
-            
-            const empresasContainer = document.getElementById('empresas-container');
-            empresasContainer.innerHTML = '';
-            
-            const empresasOrden = ['EPEC BICENTENARIO', 'EPEC EOR', 'ELING', 'CONTRATISTAS Y VISITAS', 'CAMIONES DE GASOIL'];
-            
-            empresasOrden.forEach(empresaNombre => {
-                const empresa = data.empresas.find(e => e.nombre === empresaNombre);
-                if (empresa) {
-                    const sectionClass = getSectionClass(empresaNombre);
-                    const sectionIcon = getSectionIcon(empresaNombre);
-                    
-                    const empresaSection = document.createElement('div');
-                    empresaSection.className = `col-md-6 col-lg-3`;
-                    empresaSection.innerHTML = `
-                        <div class="section ${sectionClass}">
-                            <div class="section-header">
-                                <i class="${sectionIcon}"></i> ${empresaNombre}
-                            </div>
-                            <div class="section-content">
-                                ${empresa.personas.map(persona => `
-                                    <div class="person">
-                                        <i class="${getPersonIcon(persona)}"></i>
-                                        ${persona.nombre} - ${persona.horaIngreso}
-                                        ${persona.patente ? ` (${persona.patente})` : ''}
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `;
-                    empresasContainer.appendChild(empresaSection);
-                }
-            });
-        })
-        .catch(error => {
-            console.error('Error loading dashboard data:', error);
-            document.getElementById('empresas-container').innerHTML = '<p>Error al cargar los datos. Por favor, intente nuevamente más tarde.</p>';
-        });
-}
-
-// Función para determinar la clase de la sección
-function getSectionClass(empresaNombre) {
-    switch(empresaNombre) {
-        case 'EPEC BICENTENARIO': return 'epec-bicentenario';
-        case 'EPEC EOR': return 'epec-eor';
-        case 'ELING': return 'eling';
-        case 'CONTRATISTAS Y VISITAS': return 'contratistas';
-        case 'CAMIONES DE GASOIL': return 'camiones';
-        default: return '';
-    }
-}
-
-// Función para determinar el icono de la sección
-function getSectionIcon(empresaNombre) {
-    switch(empresaNombre) {
-        case 'EPEC BICENTENARIO': return 'fas fa-bolt';
-        case 'EPEC EOR': return 'fas fa-cogs';
-        case 'ELING': return 'fas fa-industry';
-        case 'CONTRATISTAS Y VISITAS': return 'fas fa-hard-hat';
-        case 'CAMIONES DE GASOIL': return 'fas fa-truck';
-        default: return 'fas fa-building';
-    }
-}
-
-// Función para determinar el icono correcto para cada persona
-function getPersonIcon(persona) {
-    if (persona.carga && persona.carga.toUpperCase().includes('GASOIL')) {
-        return 'fas fa-truck';
-    } else if (persona.patente) {
-        return 'fas fa-car';
-    } else {
-        return 'fas fa-user';
-    }
-}
-
-// Función para cargar los datos del clima
 function loadWeatherData() {
-    fetch(WEATHER_API_URL)
-        .then(response => response.json())
-        .then(data => {
-            const currentWeather = data.current_weather;
-            const currentHour = new Date().getHours();
-            const weatherHtml = `
-                <div class="weather-item">
-                    <i class="fas fa-thermometer-half"></i>
-                    <span>${currentWeather.temperature}°C</span>
-                </div>
-                <div class="weather-item">
-                    <i class="fas fa-tint"></i>
-                    <span>${data.hourly.relativehumidity_2m[currentHour]}%</span>
-                </div>
-                <div class="weather-item">
-                    <i class="fas fa-wind"></i>
-                    <span>${currentWeather.windspeed} km/h</span>
-                </div>
-                <div class="weather-item">
-                    <i class="fas fa-compass"></i>
-                    <span>${getWindDirection(currentWeather.winddirection)}</span>
-                </div>
-            `;
-            document.getElementById('weather-data').innerHTML += weatherHtml;
-        })
-        .catch(error => {
-            console.error('Error loading weather data:', error);
-            document.getElementById('weather-data').innerHTML += '<p>Error al cargar datos del clima.</p>';
-        });
+  fetch(WEATHER_API_URL)
+    .then(response => response.json())
+    .then(data => {
+      const currentWeather = data.current_weather;
+      const currentHour = new Date().getHours();
+      const weatherHtml = `
+        <p><i class="fas fa-thermometer-half"></i> Temperatura: ${currentWeather.temperature}°C</p>
+        <p><i class="fas fa-tint"></i> Humedad: ${data.hourly.relativehumidity_2m[currentHour]}%</p>
+        <p><i class="fas fa-wind"></i> Viento: ${currentWeather.windspeed} km/h</p>
+        <p><i class="fas fa-compass"></i> Dirección del viento: ${getWindDirection(currentWeather.winddirection)}</p>
+      `;
+      document.getElementById('weather-data').innerHTML = weatherHtml;
+    })
+    .catch(error => console.error('Error loading weather data:', error));
 }
 
-// Función para convertir grados a dirección del viento
 function getWindDirection(degrees) {
-    const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
-    return directions[Math.round(degrees / 45) % 8];
+  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+  return directions[Math.round(degrees / 45) % 8];
 }
 
-// Función para actualizar la fecha y hora
-function updateDateTime() {
-    const now = new Date();
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('date').textContent = now.toLocaleDateString('es-ES', options);
-    document.getElementById('clock').textContent = now.toLocaleTimeString('es-ES');
+function loadSheetsData() {
+  console.log('Iniciando carga de datos...');
+  fetch(WEBAPP_URL)
+    .then(response => response.json())
+    .then(data => {
+      console.log('Datos recibidos:', data);
+      processData(data);
+    })
+    .catch(error => console.error('Error loading data:', error));
 }
 
-// Inicializar y actualizar periódicamente
-document.addEventListener('DOMContentLoaded', () => {
-    loadDashboardData();
-    loadWeatherData();
-    updateDateTime();
+function processData(data) {
+  console.log('Procesando datos:', data);
+  const sections = {
+    epecBicentenario: document.querySelector('#epec-bicentenario .section-content'),
+    epecEor: document.querySelector('#epec-eor .section-content'),
+    eling: document.querySelector('#eling .section-content'),
+    contratistas: document.querySelector('#contratistas .section-content'),
+    camiones: document.querySelector('#camiones .section-content')
+  };
+
+  // Limpiar contenido existente
+  Object.values(sections).forEach(section => section.innerHTML = '');
+
+  let totalPersonas = 0;
+  let totalCamiones = 0;
+  let personasPorEmpresa = {
+    epecBicentenario: 0,
+    epecEor: 0,
+    eling: 0,
+    contratistas: 0
+  };
+
+  let contratistasData = {};
+
+  data.forEach(entry => {
+    if (!entry.horaSalida) {  // Solo procesar entradas sin hora de salida
+      let section;
+      if (entry.empresa === 'EPEC BICENTENARIO') {
+        section = sections.epecBicentenario;
+        personasPorEmpresa.epecBicentenario++;
+      } else if (entry.empresa === 'EPEC EOR') {
+        section = sections.epecEor;
+        personasPorEmpresa.epecEor++;
+      } else if (entry.empresa === 'ELING') {
+        section = sections.eling;
+        personasPorEmpresa.eling++;
+      } else {
+        section = sections.contratistas;
+        personasPorEmpresa.contratistas++;
+        if (!contratistasData[entry.empresa]) {
+          contratistasData[entry.empresa] = [];
+        }
+        contratistasData[entry.empresa].push(entry);
+      }
+
+      if (section !== sections.contratistas) {
+        const personElement = document.createElement('div');
+        personElement.className = 'person';
+        const icon = entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (entry.patente ? '🚗' : '👤');
+        personElement.textContent = `${icon} ${entry.nombreCompleto}${entry.patente ? ` (${entry.patente})` : ''}`;
+        section.appendChild(personElement);
+      }
+
+      totalPersonas++;
+
+      if (entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL') {
+        const camionElement = document.createElement('div');
+        camionElement.className = 'person';
+        camionElement.textContent = `🚛 ${entry.nombreCompleto} (${entry.patente || 'N/A'})`;
+        sections.camiones.appendChild(camionElement);
+        totalCamiones++;
+      }
+    }
+  });
+
+  document.getElementById('total-personas').textContent = totalPersonas;
+  document.getElementById('total-camiones').textContent = totalCamiones;
+
+  // Actualizar contadores por empresa y mostrar/ocultar secciones
+  Object.entries(personasPorEmpresa).forEach(([empresa, count]) => {
+    const sectionElement = document.getElementById(empresa.replace('epec', 'epec-'));
+    if (count > 0) {
+      sectionElement.style.display = 'block';
+      const headerElement = sectionElement.querySelector('.section-header');
+      headerElement.innerHTML = headerElement.innerHTML.split('<span')[0] + ` <span class="badge bg-secondary">${count}</span>`;
+    } else {
+      sectionElement.style.display = 'none';
+    }
+  });
+
+  // Procesar contratistas
+  processContratistas(contratistasData);
+}
+
+function processContratistas(contratistasData) {
+  const contratistasSection = document.querySelector('#contratistas .section-content');
+  Object.entries(contratistasData).forEach(([empresa, personas]) => {
+    const empresaElement = document.createElement('div');
+    empresaElement.className = 'empresa-section';
+    empresaElement.innerHTML = `<h4>${empresa}</h4>`;
     
-    // Actualizar datos cada 5 minutos
-    setInterval(loadDashboardData, 5 * 60 * 1000);
-    setInterval(loadWeatherData, 30 * 60 * 1000);
-    setInterval(updateDateTime, 1000);
-});
+    personas.forEach(persona => {
+      const personElement = document.createElement('div');
+      personElement.className = 'person';
+      const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '👤');
+      personElement.textContent = `${icon} ${persona.nombreCompleto}${persona.patente ? ` (${persona.patente})` : ''}`;
+      empresaElement.appendChild(personElement);
+    });
+
+    contratistasSection.appendChild(empresaElement);
+  });
+}
+
+function updateClock() {
+  const now = new Date();
+  const timeString = now.toLocaleTimeString();
+  const dateString = now.toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('clock').textContent = timeString;
+  document.getElementById('date
