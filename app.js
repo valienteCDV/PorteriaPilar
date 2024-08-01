@@ -156,30 +156,53 @@ function createCompanyCard(companyName, personas) {
   return card;
 }
 
+// Actualizar la hora y la fecha de última actualización
 function updateClock() {
-  const now = new Date();
-  const timeString = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  document.getElementById('clock').textContent = timeString;
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('update-time').textContent = now.toLocaleString('es-AR');
 }
 
-function updateSafetyCalendar() {
-  const lastAccidentDate = new Date('2019-12-17');
-  const today = new Date();
-  const daysSinceLastAccident = Math.floor((today - lastAccidentDate) / (1000 * 60 * 60 * 24));
-  
-  document.getElementById('days-without-accidents').textContent = daysSinceLastAccident;
-  document.getElementById('last-accident-date').textContent = `Último accidente: 17/12/2019`;
+// Actualizar el calendario de accidentes
+function updateAccidentCalendar() {
+    const lastAccidentDate = new Date('2019-12-17');
+    const today = new Date();
+    const daysSinceLastAccident = Math.floor((today - lastAccidentDate) / (1000 * 60 * 60 * 24));
+    
+    document.getElementById('days-without-accidents').textContent = daysSinceLastAccident;
+    document.getElementById('last-accident-date').textContent = `Último accidente: ${lastAccidentDate.toLocaleDateString('es-AR')}`;
+    
+    // Aquí iría la lógica para generar el calendario visual
+    // Por ahora, solo mostraremos el número de días
 }
 
+// Actualizar la sección de otras empresas
+function updateOtherCompanies(companies) {
+    const container = document.querySelector('#other-companies .section-content');
+    container.innerHTML = '';
+    
+    companies.forEach(company => {
+        const card = document.createElement('div');
+        card.className = 'company-card';
+        card.innerHTML = `
+            <h3>${company.name}</h3>
+            ${company.personnel.map((person, index) => `
+                <div class="person">
+                    ${index + 1}. ${person.name}${person.vehicle ? ` (${person.vehicle})` : ''}
+                </div>
+            `).join('')}
+        `;
+        container.appendChild(card);
+    });
+}
+
+// Inicialización y actualizaciones periódicas
 function init() {
-  loadSheetsData();
-  updateClock();
-  loadWeatherData();
-  updateSafetyCalendar();
-  setInterval(loadSheetsData, 100000); // Actualizar datos cada 100 segundos
-  setInterval(updateClock, 1000); // Actualizar reloj cada segundo
-  setInterval(loadWeatherData, 600000); // Actualizar clima cada 10 minutos
-  setInterval(updateSafetyCalendar, 86400000); // Actualizar calendario de seguridad cada día
+    updateClock();
+    updateAccidentCalendar();
+    loadData(); // Asume que esta función carga los datos de personal y empresas
+    setInterval(updateClock, 1000);
+    setInterval(loadData, 300000); // Actualizar datos cada 5 minutos
 }
 
 document.addEventListener('DOMContentLoaded', init);
