@@ -16,13 +16,13 @@ function updateWeatherDisplay(weather, humidity) {
   const weatherHtml = `
     <p><i class="fas fa-thermometer-half"></i> ${weather.temperature}°C</p>
     <p><i class="fas fa-tint"></i> ${humidity}%</p>
-    <p><i class="fas fa-wind"></i> ${weather.windspeed} km/h ${getWindDirection(weather.winddirection)}</p>
+    <p><i class="fas fa-wind"></i> ${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h </p>
   `;
   document.getElementById('weather-data').innerHTML = weatherHtml;
 }
 
 function getWindDirection(degrees) {
-  const directions = ['N', 'NE', 'E', 'SE', 'S', 'SO', 'O', 'NO'];
+  const directions = ['Norte', 'NorEste', 'Este', 'SudEste', 'Sur', 'SudOeste', 'Oeste', 'NorOeste'];
   return directions[Math.round(degrees / 45) % 8];
 }
 
@@ -93,7 +93,7 @@ function displayCompanyPersonnel(section, company) {
     const personElement = document.createElement('div');
     personElement.className = 'person';
     const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
-    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${persona.patente}${icon})` : ''}`;
+    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
     section.appendChild(personElement);
   });
 }
