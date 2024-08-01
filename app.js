@@ -23,11 +23,9 @@ function loadWeatherData() {
  */
 function updateWeatherDisplay(weather, humidity) {
   const weatherHtml = `
-    <div class="d-flex justify-content-between align-items-center">
-      <div><i class="fas fa-thermometer-half"></i> ${weather.temperature}°C</div>
-      <div><i class="fas fa-tint"></i> ${humidity}%</div>
-      <div><i class="fas fa-wind"></i> ${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h</div>
-    </div>
+    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C</div>
+    <div><span class="weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
+    <div><span class="weather-icon"><i class="fas fa-wind"></i></span>${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h</div>
   `;
   document.getElementById('weather-data').innerHTML = weatherHtml;
 }
@@ -183,17 +181,15 @@ function createCompanyCard(companyName, personas) {
   card.className = 'company-card';
   card.innerHTML = `<h3>${companyName} <span class="badge bg-secondary">${personas.length}</span></h3>`;
   
-  const personList = document.createElement('div');
   personas.sort((a, b) => a.nombre.localeCompare(b.nombre));
   personas.forEach((persona, index) => {
     const personElement = document.createElement('div');
     personElement.className = 'person';
     const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
     personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
-    personList.appendChild(personElement);
+    card.appendChild(personElement);
   });
-  
-  card.appendChild(personList);
+
   return card;
 }
 
@@ -202,16 +198,7 @@ function createCompanyCard(companyName, personas) {
  */
 function updateClock() {
     const now = new Date();
-    const options = { 
-        day: '2-digit', 
-        month: '2-digit', 
-        year: '2-digit', 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit', 
-        hour12: false 
-    };
-    document.getElementById('clock').textContent = now.toLocaleString('es-AR', options).replace(',', '');
+    document.getElementById('clock').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 }
 
 /**
