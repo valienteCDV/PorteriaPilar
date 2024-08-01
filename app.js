@@ -14,9 +14,9 @@ function loadWeatherData() {
 
 function updateWeatherDisplay(weather, humidity) {
   const weatherHtml = `
-    <span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C
-    <span class="weather-icon"><i class="fas fa-tint"></i></span>${humidity}%
-    <span class="weather-icon"><i class="fas fa-wind"></i></span>${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h
+    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C</div>
+    <div><span class="weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
+    <div><span class="weather-icon"><i class="fas fa-wind"></i></span>${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h</div>
   `;
   document.getElementById('weather-data').innerHTML = weatherHtml;
 }
@@ -108,11 +108,13 @@ function displayContractors(section, contractorsData) {
   });
 
   let globalIndex = 1;
+  let totalContractors = 0;
   Object.entries(contractorsByCompany)
     .sort((a, b) => b[1].length - a[1].length)
     .forEach(([companyName, personnel]) => {
       const companyElement = document.createElement('div');
       companyElement.className = 'contractor-company';
+      companyElement.style.backgroundColor = getRandomPastelColor();
       companyElement.innerHTML = `<h4>${companyName} <span class="badge bg-secondary">${personnel.length}</span></h4>`;
       
       personnel.sort((a, b) => a.nombre.localeCompare(b.nombre));
@@ -124,8 +126,18 @@ function displayContractors(section, contractorsData) {
         companyElement.appendChild(personElement);
       });
       
+      totalContractors += personnel.length;
       section.appendChild(companyElement);
     });
+
+  // Actualizar el contador en el encabezado de la sección
+  const headerElement = section.closest('.section').querySelector('.section-header');
+  headerElement.innerHTML = `<i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS <span class="badge bg-secondary">${totalContractors}</span>`;
+}
+
+function getRandomPastelColor() {
+  const hue = Math.floor(Math.random() * 360);
+  return `hsla(${hue}, 100%, 85%, 0.3)`;
 }
 
 function updateClock() {
