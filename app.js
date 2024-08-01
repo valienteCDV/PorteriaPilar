@@ -2,7 +2,7 @@
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
 
 // URL de tu API de Google Apps Script (reemplaza con tu URL real)
-const DATA_API_URL = 'https://script.google.com/macros/s/TU_ID_DE_IMPLEMENTACION/exec';
+const DATA_API_URL = 'https://script.google.com/macros/s/AKfycbx0G-MiPCDJRmVybfe6Xz70NJVPb3K3NHPcHz3DpGPbVfd8q2tTWZU_PU3Gv01ODbRVKA/exec';
 
 // Función para cargar los datos del dashboard
 function loadDashboardData() {
