@@ -7,15 +7,18 @@ function loadWeatherData() {
     .then(data => {
       const currentWeather = data.current_weather;
       const currentHour = new Date().getHours();
-      const weatherHtml = `
-        <p><i class="fas fa-thermometer-half"></i> Temperatura: ${currentWeather.temperature}°C</p>
-        <p><i class="fas fa-tint"></i> Humedad: ${data.hourly.relativehumidity_2m[currentHour]}%</p>
-        <p><i class="fas fa-wind"></i> Viento: ${currentWeather.windspeed} km/h</p>
-        <p><i class="fas fa-compass"></i> Dirección del viento: ${getWindDirection(currentWeather.winddirection)}</p>
-      `;
-      document.getElementById('weather-data').innerHTML = weatherHtml;
+      updateWeatherDisplay(currentWeather, data.hourly.relativehumidity_2m[currentHour]);
     })
     .catch(error => console.error('Error loading weather data:', error));
+}
+
+function updateWeatherDisplay(weather, humidity) {
+  const weatherHtml = `
+    <p><i class="fas fa-thermometer-half"></i> ${weather.temperature}°C</p>
+    <p><i class="fas fa-tint"></i> ${humidity}%</p>
+    <p><i class="fas fa-wind"></i> ${weather.windspeed} km/h ${getWindDirection(weather.winddirection)}</p>
+  `;
+  document.getElementById('weather-data').innerHTML = weatherHtml;
 }
 
 function getWindDirection(degrees) {
@@ -55,59 +58,103 @@ function processData(data) {
   let totalCamiones = 0;
 
   data.empresas.forEach(empresa => {
-    let section;
-    switch(empresa.nombre) {
-      case 'EPEC BICENTENARIO':
-        section = sections.epecBicentenario;
-        break;
-      case 'EPEC EOR':
-        section = sections.epecEor;
-        break;
-      case 'ELING':
-        section = sections.eling;
-        break;
-      default:
-        section = sections.contratistas;
+    let section = sections[getCompanySection(empresa.nombre)];
+    
+    empresa.personas.sort((a, b) => a.nombre.localeCompare(b.nombre));
+    
+    if (empresa.nombre !== 'CONTRATISTAS Y VISITAS') {
+      displayCompanyPersonnel(section, empresa);
+    } else {
+      displayContractors(section, empresa);
     }
 
     const headerElement = section.closest('.section').querySelector('.section-header');
     headerElement.innerHTML = `${headerElement.innerHTML.split('<span')[0]} <span class="badge bg-secondary">${empresa.cantidad}</span>`;
 
-    empresa.personas.forEach(persona => {
-      const personElement = document.createElement('div');
-      personElement.className = 'person';
-      const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '👤');
-      personElement.textContent = `${icon} ${persona.nombre}${persona.patente ? ` (${persona.patente})` : ''}`;
-      section.appendChild(personElement);
-
-      if (persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL') {
-        totalCamiones++;
-      }
-    });
-
     totalPersonas += empresa.cantidad;
+    totalCamiones += empresa.personas.filter(p => p.carga && p.carga.toString().toUpperCase().trim() === 'GASOIL').length;
   });
 
   document.getElementById('total-personas').textContent = totalPersonas;
   document.getElementById('total-camiones').textContent = totalCamiones;
-  document.getElementById('camionesGasoil').textContent = totalCamiones;
+}
+
+function getCompanySection(companyName) {
+  switch(companyName) {
+    case 'EPEC BICENTENARIO': return 'epecBicentenario';
+    case 'EPEC EOR': return 'epecEor';
+    case 'ELING': return 'eling';
+    default: return 'contratistas';
+  }
+}
+
+function displayCompanyPersonnel(section, company) {
+  company.personas.forEach((persona, index) => {
+    const personElement = document.createElement('div');
+    personElement.className = 'person';
+    const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
+    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${persona.patente}${icon})` : ''}`;
+    section.appendChild(personElement);
+  });
+}
+
+function displayContractors(section, contractorsData) {
+  const contractorsByCompany = {};
+  contractorsData.personas.forEach(persona => {
+    if (!contractorsByCompany[persona.empresa]) {
+      contractorsByCompany[persona.empresa] = [];
+    }
+    contractorsByCompany[persona.empresa].push(persona);
+  });
+
+  Object.entries(contractorsByCompany)
+    .sort((a, b) => b[1].length - a[1].length)
+    .forEach(([companyName, personnel]) => {
+      const companyElement = document.createElement('div');
+      companyElement.className = 'contractor-company';
+      companyElement.innerHTML = `<h4>${companyName}</h4>`;
+      
+      personnel.sort((a, b) => a.nombre.localeCompare(b.nombre));
+      personnel.forEach((persona, index) => {
+        const personElement = document.createElement('div');
+        personElement.className = 'person';
+        const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
+        personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${persona.patente}${icon})` : ''}`;
+        companyElement.appendChild(personElement);
+      });
+      
+      section.appendChild(companyElement);
+    });
 }
 
 function updateClock() {
   const now = new Date();
-  const timeString = now.toLocaleTimeString();
+  const timeString = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
   const dateString = now.toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   document.getElementById('clock').textContent = timeString;
   document.getElementById('date').textContent = dateString;
+}
+
+function updateSafetyCalendar() {
+  const lastAccidentDate = new Date('2019-12-17');
+  const today = new Date();
+  const daysSinceLastAccident = Math.floor((today - lastAccidentDate) / (1000 * 60 * 60 * 24));
+  
+  document.getElementById('days-without-accidents').textContent = daysSinceLastAccident;
+  
+  // Aquí iría el código para generar el calendario visual
+  // Por ahora, solo mostraremos el número de días
 }
 
 function init() {
   loadSheetsData();
   updateClock();
   loadWeatherData();
+  updateSafetyCalendar();
   setInterval(loadSheetsData, 100000); // Actualizar datos cada 100 segundos
   setInterval(updateClock, 1000); // Actualizar reloj cada segundo
   setInterval(loadWeatherData, 600000); // Actualizar clima cada 10 minutos
+  setInterval(updateSafetyCalendar, 86400000); // Actualizar calendario de seguridad cada día
 }
 
 document.addEventListener('DOMContentLoaded', init);
