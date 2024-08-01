@@ -158,7 +158,8 @@ function processContratistas(contratistasData) {
 }
 
 function formatName(name) {
-  return name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join('
+  return name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+}
 
 function adjustLayout() {
   const mainContent = document.getElementById('main-content');
@@ -185,7 +186,6 @@ function updateClock() {
   document.getElementById('clock').textContent = timeString;
   document.getElementById('date').textContent = dateString;
 }
-
 
 function init() {
   loadSheetsData();
