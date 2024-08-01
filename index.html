@@ -71,15 +71,53 @@
             border-bottom: none;
         }
              
-        #clock {
-            font-size: 2.5rem;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 10px;
+        .clock-weather-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
         }
+        
+        .clock-container {
+            width: 150px;
+            height: 150px;
+            position: relative;
+        }
+        
+        .clock-face {
+            width: 100%;
+            height: 100%;
+            border: 3px solid #333;
+            border-radius: 50%;
+            position: relative;
+        }
+        
+        .hand {
+            position: absolute;
+            bottom: 50%;
+            left: 50%;
+            transform-origin: 50% 100%;
+            background-color: #333;
+        }
+        
+        .hour-hand {
+            width: 4px;
+            height: 40px;
+        }
+        
+        .minute-hand {
+            width: 2px;
+            height: 60px;
+        }
+        
+        .second-hand {
+            width: 1px;
+            height: 70px;
+            background-color: red;
+        }
+        
         #weather-data {
             font-size: 1.1rem;
-            text-align: center;
+            text-align: right;
         }
         #last-update {
             font-size: 0.8rem;
@@ -88,10 +126,49 @@
             color: #666;
         }
         
+        .indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .indicator i {
+            font-size: 2rem;
+            margin-right: 10px;
+        }
+        
+        .indicator-content {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .indicator-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        
+        .indicator-label {
+            font-size: 1rem;
+        }
+        
+        #total-personas {
+            background-color: #4e95d1;
+            color: white;
+        }
+        
+        #total-camiones {
+            background-color: #e67e22;
+            color: white;
+        }
+        
         #days-without-accidents {
             font-size: 2.5rem;
             font-weight: bold;
             color: #28a745;
+            margin-bottom: 10px;
         }
         
         .badge {
@@ -125,18 +202,6 @@
             text-align: center;
         }
 
-        .indicator {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .indicator-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
         #accident-calendar {
             margin-top: 15px;
             /* Estilos para el futuro calendario */
@@ -150,8 +215,16 @@
             <!-- Panel de Reloj, Clima y Última Actualización -->
             <div class="col-md-4">
                 <div class="info-panel">
-                    <div id="clock"></div>
-                    <div id="weather-data"></div>
+                    <div class="clock-weather-container">
+                        <div class="clock-container">
+                            <div class="clock-face">
+                                <div class="hand hour-hand" id="hour-hand"></div>
+                                <div class="hand minute-hand" id="minute-hand"></div>
+                                <div class="hand second-hand" id="second-hand"></div>
+                            </div>
+                        </div>
+                        <div id="weather-data"></div>
+                    </div>
                     <div id="last-update">Última actualización: <span id="update-time"></span></div>
                 </div>
             </div>
@@ -159,20 +232,26 @@
             <div class="col-md-4">
                 <div class="info-panel">
                     <div class="indicator">
-                        <h2><i class="fas fa-users"></i> Personas en Planta</h2>
-                        <span id="total-personas" class="indicator-value badge bg-primary">0</span>
+                        <i class="fas fa-users"></i>
+                        <div class="indicator-content">
+                            <span id="total-personas" class="indicator-value">0</span>
+                            <span class="indicator-label">Personas en Planta</span>
+                        </div>
                     </div>
                     <div class="indicator">
-                        <h2><i class="fas fa-truck"></i> Camiones de Gasoil</h2>
-                        <span id="total-camiones" class="indicator-value badge bg-success">0</span>
+                        <i class="fas fa-truck"></i>
+                        <div class="indicator-content">
+                            <span id="total-camiones" class="indicator-value">0</span>
+                            <span class="indicator-label">Camiones de Gasoil</span>
+                        </div>
                     </div>
                 </div>
             </div>
             <!-- Panel de Días sin accidentes -->
             <div class="col-md-4">
                 <div class="info-panel text-center">
-                    <h2>Días sin accidentes</h2>
                     <div id="days-without-accidents"></div>
+                    <h2>Días sin accidentes</h2>
                     <small id="last-accident-date"></small>
                     <div id="accident-calendar">
                         <!-- Aquí irá el calendario de accidentes -->
