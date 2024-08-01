@@ -5,10 +5,13 @@ function loadPersonData() {
     fetch(WEBAPP_URL)
         .then(response => response.json())
         .then(data => {
-            updateCompanyList('epec-bicentenario', data.filter(person => person.empresa === 'EPEC BICENTENARIO'));
-            updateCompanyList('eling', data.filter(person => person.empresa === 'ELING'));
-            updateCompanyList('epec-eor', data.filter(person => person.empresa === 'EPEC EOR'));
-            updateCompanyList('others', data.filter(person => !['EPEC BICENTENARIO', 'ELING', 'EPEC EOR'].includes(person.empresa)));
+            // Filtrar personas que no tienen hora de salida
+            const peopleInside = data.filter(person => !person.horaSalida);
+            
+            updateCompanyList('epec-bicentenario', peopleInside.filter(person => person.empresa === 'EPEC BICENTENARIO'));
+            updateCompanyList('eling', peopleInside.filter(person => person.empresa === 'ELING'));
+            updateCompanyList('epec-eor', peopleInside.filter(person => person.empresa === 'EPEC EOR'));
+            updateCompanyList('others', peopleInside.filter(person => !['EPEC BICENTENARIO', 'ELING', 'EPEC EOR'].includes(person.empresa)));
         })
         .catch(error => console.error('Error loading person data:', error));
 }
@@ -34,20 +37,20 @@ function loadWeatherData() {
             const currentHour = new Date().getHours();
             const weatherHtml = `
                 <div>
-                    <p><i class="fas fa-thermometer-half"></i> Temperatura</p>
-                    <p class="text-2xl font-bold">${currentWeather.temperature}°C</p>
+                    <i class="fas fa-thermometer-half text-xl"></i>
+                    <span class="text-xl font-bold">${currentWeather.temperature}°C</span>
                 </div>
                 <div>
-                    <p><i class="fas fa-tint"></i> Humedad</p>
-                    <p class="text-2xl font-bold">${data.hourly.relativehumidity_2m[currentHour]}%</p>
+                    <i class="fas fa-tint text-xl"></i>
+                    <span class="text-xl font-bold">${data.hourly.relativehumidity_2m[currentHour]}%</span>
                 </div>
                 <div>
-                    <p><i class="fas fa-wind"></i> Viento</p>
-                    <p class="text-2xl font-bold">${currentWeather.windspeed} km/h</p>
+                    <i class="fas fa-wind text-xl"></i>
+                    <span class="text-xl font-bold">${currentWeather.windspeed} km/h</span>
                 </div>
                 <div>
-                    <p><i class="fas fa-compass"></i> Dirección del viento</p>
-                    <p class="text-2xl font-bold">${getWindDirection(currentWeather.winddirection)}</p>
+                    <i class="fas fa-compass text-xl"></i>
+                    <span class="text-xl font-bold">${getWindDirection(currentWeather.winddirection)}</span>
                 </div>
             `;
             document.getElementById('weather-data').innerHTML = weatherHtml;
@@ -60,13 +63,20 @@ function getWindDirection(degrees) {
     return directions[Math.round(degrees / 45) % 8];
 }
 
+function updateDateTime() {
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    document.getElementById('datetime').textContent = now.toLocaleDateString('es-AR', options);
+}
+
 function updateDashboard() {
     loadPersonData();
     loadWeatherData();
+    updateDateTime();
 }
 
-// Update the dashboard every 5 minutes
-setInterval(updateDashboard, 5 * 60 * 1000);
+// Update the dashboard every minute
+setInterval(updateDashboard, 60 * 1000);
 
 // Initial update
 updateDashboard();
