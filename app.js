@@ -14,9 +14,9 @@ function loadWeatherData() {
 
 function updateWeatherDisplay(weather, humidity) {
   const weatherHtml = `
-    <i class="fas fa-thermometer-half"></i> ${weather.temperature}°C
-    <i class="fas fa-tint"></i> ${humidity}%
-    <i class="fas fa-wind"></i> ${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h
+    <span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C
+    <span class="weather-icon"><i class="fas fa-tint"></i></span>${humidity}%
+    <span class="weather-icon"><i class="fas fa-wind"></i></span>${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h
   `;
   document.getElementById('weather-data').innerHTML = weatherHtml;
 }
@@ -139,10 +139,8 @@ function updateSafetyCalendar() {
   const today = new Date();
   const daysSinceLastAccident = Math.floor((today - lastAccidentDate) / (1000 * 60 * 60 * 24));
   
-  document.getElementById('days-without-accidents').innerHTML = `
-    ${daysSinceLastAccident}<br>
-    <small>Último accidente: 17/12/2019</small>
-  `;
+  document.getElementById('days-without-accidents').textContent = daysSinceLastAccident;
+  document.getElementById('last-accident-date').textContent = `Último accidente: 17/12/2019`;
 }
 
 function init() {
