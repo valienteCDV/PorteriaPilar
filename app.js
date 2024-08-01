@@ -2,9 +2,11 @@ const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbytUUnWCA3I3JLdLOv8r
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
 
 function loadWeatherData() {
+    console.log('Iniciando carga de datos meteorológicos...');
     fetch(WEATHER_API_URL)
         .then(response => response.json())
         .then(data => {
+            console.log('Datos meteorológicos recibidos:', data);
             const currentWeather = data.current_weather;
             const currentHour = new Date().getHours();
             const weatherHtml = `
@@ -24,18 +26,18 @@ function getWindDirection(degrees) {
 }
 
 function loadSheetsData() {
-    console.log('Iniciando carga de datos...');
+    console.log('Iniciando carga de datos de la hoja...');
     fetch(WEBAPP_URL)
         .then(response => response.json())
         .then(data => {
-            console.log('Datos recibidos:', data);
+            console.log('Datos recibidos de la hoja:', data);
             processData(data);
         })
-        .catch(error => console.error('Error loading data:', error));
+        .catch(error => console.error('Error loading sheet data:', error));
 }
 
 function processData(data) {
-    console.log('Procesando datos:', data);
+    console.log('Procesando datos...');
     const sections = {
         epecBicentenario: document.getElementById('epec-bicentenario'),
         epecEor: document.getElementById('epec-eor'),
@@ -44,26 +46,36 @@ function processData(data) {
         camiones: document.getElementById('camiones')
     };
 
-    Object.values(sections).forEach(section => {
+    console.log('Limpiando secciones...');
+    Object.entries(sections).forEach(([key, section]) => {
         if (section) {
             section.innerHTML = '';
             const sectionParent = section.closest('.section');
             if (sectionParent) sectionParent.style.display = 'none';
+        } else {
+            console.warn(`Sección ${key} no encontrada en el DOM`);
         }
     });
 
-    const todasLasPersonas = data.map(row => ({
-        empresa: row.empresa,
-        apellido: row.nombreCompleto.split(' ')[0],
-        nombre: row.nombreCompleto.split(' ').slice(1).join(' '),
-        nombreCompleto: row.nombreCompleto,
-        patente: row.patente,
-        horaIngreso: new Date(row.horaIngreso),
-        horaSalida: row.horaSalida ? new Date(row.horaSalida) : null,
-        carga: row.carga
-    }));
+    console.log('Procesando personas...');
+    const todasLasPersonas = data.map(row => {
+        console.log('Procesando fila:', row);
+        return {
+            empresa: row.empresa,
+            apellido: row.nombreCompleto.split(' ')[0],
+            nombre: row.nombreCompleto.split(' ').slice(1).join(' '),
+            nombreCompleto: row.nombreCompleto,
+            patente: row.patente,
+            horaIngreso: new Date(row.horaIngreso),
+            horaSalida: row.horaSalida ? new Date(row.horaSalida) : null,
+            carga: row.carga
+        };
+    });
 
+    console.log('Filtrando personas adentro...');
     const personasAdentro = todasLasPersonas.filter(p => !p.horaSalida);
+    console.log('Personas adentro:', personasAdentro.length);
+
     personasAdentro.sort((a, b) => a.apellido.localeCompare(b.apellido, 'es', { sensitivity: 'base' }));
 
     let totalPersonas = personasAdentro.length;
@@ -72,7 +84,9 @@ function processData(data) {
     const empresasEspeciales = ['EPEC BICENTENARIO', 'ELING', 'EPEC EOR'];
     const contratistasData = {};
 
+    console.log('Distribuyendo personas en secciones...');
     personasAdentro.forEach(persona => {
+        console.log('Procesando persona:', persona);
         let section;
         if (empresasEspeciales.includes(persona.empresa)) {
             section = sections[persona.empresa.toLowerCase().replace(' ', '-')];
@@ -103,14 +117,17 @@ function processData(data) {
         }
     });
 
+    console.log('Actualizando contadores...');
     document.getElementById('total-personas').textContent = totalPersonas;
     document.getElementById('total-camiones').textContent = totalCamiones;
 
+    console.log('Actualizando secciones especiales...');
     empresasEspeciales.forEach(empresa => {
         const sectionId = empresa.toLowerCase().replace(' ', '-');
         const sectionElement = document.getElementById(sectionId);
         if (sectionElement) {
             const count = sectionElement.childElementCount;
+            console.log(`${empresa}: ${count} personas`);
             if (count > 0) {
                 sectionElement.closest('.section').style.display = 'block';
                 const headerElement = sectionElement.closest('.section').querySelector('.section-header');
@@ -118,27 +135,47 @@ function processData(data) {
                     headerElement.innerHTML = `${headerElement.innerHTML.split('<span')[0]} <span class="badge bg-secondary">${count}</span>`;
                 }
             }
+        } else {
+            console.warn(`Sección ${sectionId} no encontrada`);
         }
     });
 
+    console.log('Procesando contratistas...');
     if (Object.keys(contratistasData).length > 0) {
         processContratistas(contratistasData);
-        sections.contratistas.closest('.section').style.display = 'block';
+        if (sections.contratistas) {
+            sections.contratistas.closest('.section').style.display = 'block';
+        } else {
+            console.warn('Sección de contratistas no encontrada');
+        }
     }
 
+    console.log('Actualizando sección de camiones...');
     if (sections.camiones) {
         const camionesParent = sections.camiones.closest('.section');
-        if (camionesParent) camionesParent.style.display = totalCamiones > 0 ? 'block' : 'none';
+        if (camionesParent) {
+            camionesParent.style.display = totalCamiones > 0 ? 'block' : 'none';
+        } else {
+            console.warn('Sección padre de camiones no encontrada');
+        }
+    } else {
+        console.warn('Sección de camiones no encontrada');
     }
 
+    console.log('Ajustando layout...');
     adjustLayout();
 }
 
 function processContratistas(contratistasData) {
+    console.log('Procesando contratistas:', contratistasData);
     const contratistasSection = document.getElementById('contratistas');
-    if (!contratistasSection) return;
+    if (!contratistasSection) {
+        console.warn('Sección de contratistas no encontrada');
+        return;
+    }
 
     Object.entries(contratistasData).forEach(([empresa, personas]) => {
+        console.log(`Procesando empresa: ${empresa}, Personas: ${personas.length}`);
         const empresaElement = document.createElement('div');
         empresaElement.className = 'empresa-section';
         empresaElement.innerHTML = `<h4>${empresa}</h4>`;
@@ -149,45 +186,3 @@ function processContratistas(contratistasData) {
             const icon = persona.patente ? '🚗' : '';
             personElement.textContent = `${persona.nombreCompleto}${persona.patente ? ` (${icon} ${persona.patente})` : ''}`;
             empresaElement.appendChild(personElement);
-        });
-
-        contratistasSection.appendChild(empresaElement);
-    });
-}
-
-function adjustLayout() {
-    const mainContent = document.getElementById('main-content');
-    const visibleSections = mainContent.querySelectorAll('.section[style="display: block;"]');
-    
-    visibleSections.forEach(section => {
-        section.classList.remove('col-md-6', 'col-lg-3', 'col-md-4', 'col-md-12');
-        if (visibleSections.length === 3) {
-            section.classList.add('col-md-4');
-        } else if (visibleSections.length === 2) {
-            section.classList.add('col-md-6');
-        } else if (visibleSections.length === 1) {
-            section.classList.add('col-md-12');
-        } else {
-            section.classList.add('col-md-6', 'col-lg-3');
-        }
-    });
-}
-
-function updateClock() {
-  const now = new Date();
-  const timeString = now.toLocaleTimeString();
-  const dateString = now.toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-  document.getElementById('clock').textContent = timeString;
-  document.getElementById('date').textContent = dateString;
-}
-
-function init() {
-  loadSheetsData();
-  updateClock();
-  loadWeatherData();
-  setInterval(loadSheetsData, 100000); // Actualizar datos cada 100 segundos
-  setInterval(updateClock, 1000); // Actualizar reloj cada segundo
-  setInterval(loadWeatherData, 600000); // Actualizar clima cada 10 minutos
-}
-
-document.addEventListener('DOMContentLoaded', init);
