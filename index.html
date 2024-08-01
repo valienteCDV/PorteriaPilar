@@ -125,7 +125,36 @@
             font-size: 1.5rem;
             margin-right: 5px;
         }
-    </style>
+.contractor-company {
+        margin-bottom: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .company-header {
+        background-color: #f8f9fa;
+        padding: 5px 10px;
+        font-weight: bold;
+        border-bottom: 1px solid #ddd;
+    }
+    .contractor-company .person {
+        padding: 5px 10px;
+        border-bottom: 1px solid #eee;
+    }
+    .contractor-company .person:last-child {
+        border-bottom: none;
+    }
+
+    /* Ajuste para el encabezado de la sección de contratistas */
+    .contratistas .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .contratistas .section-header .badge {
+        font-size: 0.9rem;
+    }
+</style>
 </head>
 <body>
     <div class="dashboard-container">
@@ -167,11 +196,12 @@
             <!-- Sección de Contratistas y Visitas -->
             <div class="col-md-3">
                 <div class="section contratistas" id="contratistas">
-                    <div class="section-header">
-                        <i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS
-                    </div>
-                    <div class="section-content"></div>
-                </div>
+    <div class="section-header">
+        <i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS
+        <span class="badge bg-secondary">0</span>
+    </div>
+    <div class="section-content"></div>
+</div>
             </div>
             <!-- Sección de EPEC BICENTENARIO -->
             <div class="col-md-3">
