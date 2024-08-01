@@ -15,47 +15,50 @@
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             gap: 1rem;
+            height: calc(100vh - 2rem);
         }
         .company-section {
             background-color: #2d3748;
             border-radius: 0.5rem;
             padding: 1rem;
+            overflow-y: auto;
         }
-        .weather-section {
+        .header-section {
             grid-column: span 4;
             background-color: #2d3748;
             border-radius: 0.5rem;
             padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
-<body class="p-8">
-    <h1 class="text-4xl font-bold mb-8">Control de Ingreso - Planta Central Eléctrica</h1>
-    
+<body class="p-4">
     <div class="grid-container">
+        <div id="header" class="header-section">
+            <div id="datetime" class="text-2xl"></div>
+            <div id="weather-data" class="flex space-x-4"></div>
+        </div>
+        
         <div id="epec-bicentenario" class="company-section">
-            <h2 class="text-2xl font-semibold mb-4">EPEC BICENTENARIO</h2>
-            <ul id="epec-bicentenario-list"></ul>
+            <h2 class="text-xl font-semibold mb-2">EPEC BICENTENARIO</h2>
+            <ul id="epec-bicentenario-list" class="space-y-1"></ul>
         </div>
         
         <div id="eling" class="company-section">
-            <h2 class="text-2xl font-semibold mb-4">ELING</h2>
-            <ul id="eling-list"></ul>
+            <h2 class="text-xl font-semibold mb-2">ELING</h2>
+            <ul id="eling-list" class="space-y-1"></ul>
         </div>
         
         <div id="epec-eor" class="company-section">
-            <h2 class="text-2xl font-semibold mb-4">EPEC EOR</h2>
-            <ul id="epec-eor-list"></ul>
+            <h2 class="text-xl font-semibold mb-2">EPEC EOR</h2>
+            <ul id="epec-eor-list" class="space-y-1"></ul>
         </div>
         
         <div id="others" class="company-section">
-            <h2 class="text-2xl font-semibold mb-4">Otras Empresas</h2>
-            <ul id="others-list"></ul>
-        </div>
-        
-        <div id="weather" class="weather-section">
-            <h2 class="text-2xl font-semibold mb-4">Información Meteorológica</h2>
-            <div id="weather-data" class="grid grid-cols-4 gap-4"></div>
+            <h2 class="text-xl font-semibold mb-2">Otras Empresas</h2>
+            <ul id="others-list" class="space-y-1"></ul>
         </div>
     </div>
 
