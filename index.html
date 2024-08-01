@@ -16,7 +16,7 @@
             color: white;
             padding: 10px 0;
         }
-        .total-info, .weather-info {
+        .info-panel {
             background-color: #ffffff;
             border-left: 5px solid #0066cc;
             padding: 15px;
@@ -53,14 +53,19 @@
         .person:last-child {
             border-bottom: none;
         }
-        .empresa-section {
+        .contractor-company {
             margin-bottom: 15px;
         }
-        .empresa-section h4 {
+        .contractor-company h4 {
             font-size: 1.1rem;
             margin-bottom: 10px;
             border-bottom: 1px solid #eee;
             padding-bottom: 5px;
+        }
+        #safety-calendar {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -81,20 +86,26 @@
 
     <div class="container-fluid mt-4">
         <div class="row">
-            <div class="col-md-4">
-                <div class="total-info">
+            <div class="col-md-3">
+                <div class="info-panel">
                     <h2 class="mb-0"><i class="fas fa-users"></i> Personas en Planta: <span id="total-personas" class="badge bg-primary">0</span></h2>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="total-info">
+            <div class="col-md-3">
+                <div class="info-panel">
                     <h2 class="mb-0"><i class="fas fa-truck"></i> Camiones de Gasoil: <span id="total-camiones" class="badge bg-primary">0</span></h2>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="weather-info">
+            <div class="col-md-3">
+                <div class="info-panel">
                     <h3><i class="fas fa-cloud-sun"></i> Clima en Pilar, Córdoba</h3>
                     <div id="weather-data"></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="info-panel" id="safety-calendar">
+                    <h3>Días sin accidentes</h3>
+                    <div id="days-without-accidents"></div>
                 </div>
             </div>
         </div>
