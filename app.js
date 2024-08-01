@@ -44,14 +44,11 @@ function processData(data) {
     camiones: document.getElementById('camiones')
   };
 
-  // Limpiar contenido existente
   Object.values(sections).forEach(section => {
     if (section) {
       section.innerHTML = '';
       const sectionParent = section.closest('.section');
-      if (sectionParent) {
-        sectionParent.style.display = 'none';
-      }
+      if (sectionParent) sectionParent.style.display = 'none';
     }
   });
 
@@ -67,7 +64,7 @@ function processData(data) {
   let contratistasData = {};
 
   data.forEach(entry => {
-    if (!entry.horaSalida) {  // Solo procesar entradas sin hora de salida
+    if (!entry.horaSalida) {
       let section;
       if (entry.empresa === 'EPEC BICENTENARIO') {
         section = sections.epecBicentenario;
@@ -112,7 +109,6 @@ function processData(data) {
   document.getElementById('total-personas').textContent = totalPersonas;
   document.getElementById('total-camiones').textContent = totalCamiones;
 
-  // Actualizar contadores por empresa y mostrar/ocultar secciones
   Object.entries(personasPorEmpresa).forEach(([empresa, count]) => {
     const sectionElement = document.getElementById(empresa);
     if (sectionElement && count > 0) {
@@ -127,24 +123,17 @@ function processData(data) {
     }
   });
 
-  // Procesar contratistas
   if (personasPorEmpresa.contratistas > 0 && sections.contratistas) {
     processContratistas(contratistasData);
     const contratistasParent = sections.contratistas.closest('.section');
-    if (contratistasParent) {
-      contratistasParent.style.display = 'block';
-    }
+    if (contratistasParent) contratistasParent.style.display = 'block';
   }
 
-  // Mostrar/ocultar sección de camiones
   if (sections.camiones) {
     const camionesParent = sections.camiones.closest('.section');
-    if (camionesParent) {
-      camionesParent.style.display = totalCamiones > 0 ? 'block' : 'none';
-    }
+    if (camionesParent) camionesParent.style.display = totalCamiones > 0 ? 'block' : 'none';
   }
 
-  // Ajustar el layout si algunas secciones están ocultas
   adjustLayout();
 }
 
@@ -174,7 +163,7 @@ function adjustLayout() {
   const visibleSections = mainContent.querySelectorAll('.section[style="display: block;"]');
   
   visibleSections.forEach(section => {
-    section.classList.remove('col-md-6', 'col-lg-3');
+    section.classList.remove('col-md-6', 'col-lg-3', 'col-md-4', 'col-md-12');
     if (visibleSections.length === 3) {
       section.classList.add('col-md-4');
     } else if (visibleSections.length === 2) {
@@ -194,6 +183,7 @@ function updateClock() {
   document.getElementById('clock').textContent = timeString;
   document.getElementById('date').textContent = dateString;
 }
+
 
 function init() {
   loadSheetsData();
