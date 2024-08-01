@@ -1,4 +1,4 @@
-const WEBAPP_URL = 'https://script.googleusercontent.com/macros/echo?user_content_key=T1T-Ksn1Vk-4SeKNOOkV8UInWaia9cX-M5A7IenztLnfxm6Fh9TNCKj-Ok3K2z5F5SAwStyVzMSn0xsCH5C3duX_exObaDkCm5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnP4c9KToyw9YW6L56xXAJSipg1vKsN4HEjr0RUCJdnL_QlGwKAOjS4mazvbz4uUOtWCcL6933RJVAWBjFNo5rHZ3AXleNoPCNNz9Jw9Md8uu&lib=MCd94xyADNjRlrDad36TLIUfIMEvM9E86';
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbx0G-MiPCDJRmVybfe6Xz70NJVPb3K3NHPcHz3DpGPbVfd8q2tTWZU_PU3Gv01ODbRVKA/exec';
 const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
 
 function loadWeatherData() {
@@ -14,9 +14,9 @@ function loadWeatherData() {
 
 function updateWeatherDisplay(weather, humidity) {
   const weatherHtml = `
-    <p><i class="fas fa-thermometer-half"></i> ${weather.temperature}°C</p>
-    <p><i class="fas fa-tint"></i> ${humidity}%</p>
-    <p><i class="fas fa-wind"></i> ${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h </p>
+    <i class="fas fa-thermometer-half"></i> ${weather.temperature}°C
+    <i class="fas fa-tint"></i> ${humidity}%
+    <i class="fas fa-wind"></i> ${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h
   `;
   document.getElementById('weather-data').innerHTML = weatherHtml;
 }
@@ -107,19 +107,20 @@ function displayContractors(section, contractorsData) {
     contractorsByCompany[persona.empresa].push(persona);
   });
 
+  let globalIndex = 1;
   Object.entries(contractorsByCompany)
     .sort((a, b) => b[1].length - a[1].length)
     .forEach(([companyName, personnel]) => {
       const companyElement = document.createElement('div');
       companyElement.className = 'contractor-company';
-      companyElement.innerHTML = `<h4>${companyName}</h4>`;
+      companyElement.innerHTML = `<h4>${companyName} <span class="badge bg-secondary">${personnel.length}</span></h4>`;
       
       personnel.sort((a, b) => a.nombre.localeCompare(b.nombre));
-      personnel.forEach((persona, index) => {
+      personnel.forEach((persona) => {
         const personElement = document.createElement('div');
         personElement.className = 'person';
         const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
-        personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${persona.patente}${icon})` : ''}`;
+        personElement.textContent = `${globalIndex++}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
         companyElement.appendChild(personElement);
       });
       
@@ -129,10 +130,8 @@ function displayContractors(section, contractorsData) {
 
 function updateClock() {
   const now = new Date();
-  const timeString = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-  const dateString = now.toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  const timeString = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
   document.getElementById('clock').textContent = timeString;
-  document.getElementById('date').textContent = dateString;
 }
 
 function updateSafetyCalendar() {
@@ -140,10 +139,10 @@ function updateSafetyCalendar() {
   const today = new Date();
   const daysSinceLastAccident = Math.floor((today - lastAccidentDate) / (1000 * 60 * 60 * 24));
   
-  document.getElementById('days-without-accidents').textContent = daysSinceLastAccident;
-  
-  // Aquí iría el código para generar el calendario visual
-  // Por ahora, solo mostraremos el número de días
+  document.getElementById('days-without-accidents').innerHTML = `
+    ${daysSinceLastAccident}<br>
+    <small>Último accidente: 17/12/2019</small>
+  `;
 }
 
 function init() {
