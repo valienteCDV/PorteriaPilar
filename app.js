@@ -46,8 +46,13 @@ function processData(data) {
 
   // Limpiar contenido existente
   Object.values(sections).forEach(section => {
-    section.innerHTML = '';
-    section.closest('.section').style.display = 'none';
+    if (section) {
+      section.innerHTML = '';
+      const sectionParent = section.closest('.section');
+      if (sectionParent) {
+        sectionParent.style.display = 'none';
+      }
+    }
   });
 
   let totalPersonas = 0;
@@ -82,7 +87,7 @@ function processData(data) {
         contratistasData[entry.empresa].push(entry);
       }
 
-      if (section !== sections.contratistas) {
+      if (section && section !== sections.contratistas) {
         const personElement = document.createElement('div');
         personElement.className = 'person';
         const icon = entry.patente ? '🚗' : '';
@@ -96,35 +101,52 @@ function processData(data) {
         const camionElement = document.createElement('div');
         camionElement.className = 'person';
         camionElement.textContent = `${entry.nombreCompleto} (🚛 ${entry.patente || 'N/A'})`;
-        sections.camiones.appendChild(camionElement);
+        if (sections.camiones) {
+          sections.camiones.appendChild(camionElement);
+        }
         totalCamiones++;
       }
     }
   });
 
-  document.getElementById('total-personas').textContent = totalPersonas;
-  document.getElementById('total-camiones').textContent = totalCamiones;
+  if (document.getElementById('total-personas')) {
+    document.getElementById('total-personas').textContent = totalPersonas;
+  }
+  if (document.getElementById('total-camiones')) {
+    document.getElementById('total-camiones').textContent = totalCamiones;
+  }
 
   // Actualizar contadores por empresa y mostrar/ocultar secciones
   Object.entries(personasPorEmpresa).forEach(([empresa, count]) => {
     const sectionElement = document.getElementById(empresa);
-    if (count > 0) {
-      sectionElement.closest('.section').style.display = 'block';
-      const headerElement = sectionElement.closest('.section').querySelector('.section-header');
-      headerElement.innerHTML = `${headerElement.innerHTML.split('<span')[0]} <span class="badge bg-secondary">${count}</span>`;
-    } else {
-      sectionElement.closest('.section').style.display = 'none';
+    if (sectionElement && count > 0) {
+      const sectionParent = sectionElement.closest('.section');
+      if (sectionParent) {
+        sectionParent.style.display = 'block';
+        const headerElement = sectionParent.querySelector('.section-header');
+        if (headerElement) {
+          headerElement.innerHTML = `${headerElement.innerHTML.split('<span')[0]} <span class="badge bg-secondary">${count}</span>`;
+        }
+      }
     }
   });
 
   // Procesar contratistas
-  if (personasPorEmpresa.contratistas > 0) {
+  if (personasPorEmpresa.contratistas > 0 && sections.contratistas) {
     processContratistas(contratistasData);
-    sections.contratistas.closest('.section').style.display = 'block';
+    const contratistasParent = sections.contratistas.closest('.section');
+    if (contratistasParent) {
+      contratistasParent.style.display = 'block';
+    }
   }
 
   // Mostrar/ocultar sección de camiones
-  sections.camiones.closest('.section').style.display = totalCamiones > 0 ? 'block' : 'none';
+  if (sections.camiones) {
+    const camionesParent = sections.camiones.closest('.section');
+    if (camionesParent) {
+      camionesParent.style.display = totalCamiones > 0 ? 'block' : 'none';
+    }
+  }
 
   // Ajustar el layout si algunas secciones están ocultas
   adjustLayout();
