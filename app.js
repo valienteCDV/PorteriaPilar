@@ -91,7 +91,7 @@ function processData(data) {
         const personElement = document.createElement('div');
         personElement.className = 'person';
         const icon = entry.patente ? '🚗' : '';
-        personElement.textContent = `${entry.nombreCompleto}${entry.patente ? ` (${icon} ${entry.patente})` : ''}`;
+        personElement.textContent = `${entry.apellido} ${entry.nombre}${entry.patente ? ` (${icon} ${entry.patente})` : ''}`;
         section.appendChild(personElement);
       }
 
@@ -100,7 +100,7 @@ function processData(data) {
       if (entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL') {
         const camionElement = document.createElement('div');
         camionElement.className = 'person';
-        camionElement.textContent = `${entry.nombreCompleto} (🚛 ${entry.patente || 'N/A'})`;
+        camionElement.textContent = `${entry.apellido} ${entry.nombre} (🚛 ${entry.patente || 'N/A'})`;
         if (sections.camiones) {
           sections.camiones.appendChild(camionElement);
         }
@@ -109,12 +109,8 @@ function processData(data) {
     }
   });
 
-  if (document.getElementById('total-personas')) {
-    document.getElementById('total-personas').textContent = totalPersonas;
-  }
-  if (document.getElementById('total-camiones')) {
-    document.getElementById('total-camiones').textContent = totalCamiones;
-  }
+  document.getElementById('total-personas').textContent = totalPersonas;
+  document.getElementById('total-camiones').textContent = totalCamiones;
 
   // Actualizar contadores por empresa y mostrar/ocultar secciones
   Object.entries(personasPorEmpresa).forEach(([empresa, count]) => {
@@ -154,6 +150,8 @@ function processData(data) {
 
 function processContratistas(contratistasData) {
   const contratistasSection = document.getElementById('contratistas');
+  if (!contratistasSection) return;
+
   Object.entries(contratistasData).forEach(([empresa, personas]) => {
     const empresaElement = document.createElement('div');
     empresaElement.className = 'empresa-section';
@@ -162,8 +160,8 @@ function processContratistas(contratistasData) {
     personas.forEach(persona => {
       const personElement = document.createElement('div');
       personElement.className = 'person';
-      const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : '🚗';
-      personElement.textContent = `${persona.nombreCompleto}${persona.patente ? ` (${icon} ${persona.patente})` : ''}`;
+      const icon = persona.patente ? '🚗' : '';
+      personElement.textContent = `${persona.apellido} ${persona.nombre}${persona.patente ? ` (${icon} ${persona.patente})` : ''}`;
       empresaElement.appendChild(personElement);
     });
 
