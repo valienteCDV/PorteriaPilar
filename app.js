@@ -64,45 +64,44 @@ function processData(data) {
   let contratistasData = {};
 
   data.forEach(entry => {
-    if (!entry.horaSalida) {
-      let section;
-      if (entry.empresa === 'EPEC BICENTENARIO') {
-        section = sections.epecBicentenario;
-        personasPorEmpresa.epecBicentenario++;
-      } else if (entry.empresa === 'EPEC EOR') {
-        section = sections.epecEor;
-        personasPorEmpresa.epecEor++;
-      } else if (entry.empresa === 'ELING') {
-        section = sections.eling;
-        personasPorEmpresa.eling++;
-      } else {
-        section = sections.contratistas;
-        personasPorEmpresa.contratistas++;
-        if (!contratistasData[entry.empresa]) {
-          contratistasData[entry.empresa] = [];
-        }
-        contratistasData[entry.empresa].push(entry);
+    // Asumimos que todas las entradas son válidas ya que no tenemos un campo de hora de salida
+    let section;
+    if (entry.empresa === 'EPEC BICENTENARIO') {
+      section = sections.epecBicentenario;
+      personasPorEmpresa.epecBicentenario++;
+    } else if (entry.empresa === 'EPEC EOR') {
+      section = sections.epecEor;
+      personasPorEmpresa.epecEor++;
+    } else if (entry.empresa === 'ELING') {
+      section = sections.eling;
+      personasPorEmpresa.eling++;
+    } else {
+      section = sections.contratistas;
+      personasPorEmpresa.contratistas++;
+      if (!contratistasData[entry.empresa]) {
+        contratistasData[entry.empresa] = [];
       }
+      contratistasData[entry.empresa].push(entry);
+    }
 
-      if (section && section !== sections.contratistas) {
-        const personElement = document.createElement('div');
-        personElement.className = 'person';
-        const icon = entry.patente ? '🚗' : '';
-        personElement.textContent = `${entry.apellido} ${entry.nombre}${entry.patente ? ` (${icon} ${entry.patente})` : ''}`;
-        section.appendChild(personElement);
+    if (section && section !== sections.contratistas) {
+      const personElement = document.createElement('div');
+      personElement.className = 'person';
+      const icon = entry.patente ? '🚗' : '';
+      personElement.textContent = `${formatName(entry.nombreCompleto)}${entry.patente ? ` (${icon} ${entry.patente})` : ''}`;
+      section.appendChild(personElement);
+    }
+
+    totalPersonas++;
+
+    if (entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL') {
+      const camionElement = document.createElement('div');
+      camionElement.className = 'person';
+      camionElement.textContent = `${formatName(entry.nombreCompleto)} (🚛 ${entry.patente || 'N/A'})`;
+      if (sections.camiones) {
+        sections.camiones.appendChild(camionElement);
       }
-
-      totalPersonas++;
-
-      if (entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL') {
-        const camionElement = document.createElement('div');
-        camionElement.className = 'person';
-        camionElement.textContent = `${entry.apellido} ${entry.nombre} (🚛 ${entry.patente || 'N/A'})`;
-        if (sections.camiones) {
-          sections.camiones.appendChild(camionElement);
-        }
-        totalCamiones++;
-      }
+      totalCamiones++;
     }
   });
 
@@ -150,13 +149,16 @@ function processContratistas(contratistasData) {
       const personElement = document.createElement('div');
       personElement.className = 'person';
       const icon = persona.patente ? '🚗' : '';
-      personElement.textContent = `${persona.apellido} ${persona.nombre}${persona.patente ? ` (${icon} ${persona.patente})` : ''}`;
+      personElement.textContent = `${formatName(persona.nombreCompleto)}${persona.patente ? ` (${icon} ${persona.patente})` : ''}`;
       empresaElement.appendChild(personElement);
     });
 
     contratistasSection.appendChild(empresaElement);
   });
 }
+
+function formatName(name) {
+  return name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join('
 
 function adjustLayout() {
   const mainContent = document.getElementById('main-content');
