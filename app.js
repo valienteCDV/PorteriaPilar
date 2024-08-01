@@ -107,28 +107,28 @@ function displayContractors(section, contractorsData) {
     contractorsByCompany[persona.empresa].push(persona);
   });
 
-  let globalIndex = 1;
   let totalContractors = 0;
-  Object.entries(contractorsByCompany)
-    .sort((a, b) => b[1].length - a[1].length)
-    .forEach(([companyName, personnel]) => {
-      const companyElement = document.createElement('div');
-      companyElement.className = 'contractor-company';
-      companyElement.style.backgroundColor = getRandomPastelColor();
-      companyElement.innerHTML = `<h4>${companyName} <span class="badge bg-secondary">${personnel.length}</span></h4>`;
-      
-      personnel.sort((a, b) => a.nombre.localeCompare(b.nombre));
-      personnel.forEach((persona) => {
-        const personElement = document.createElement('div');
-        personElement.className = 'person';
-        const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
-        personElement.textContent = `${globalIndex++}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
-        companyElement.appendChild(personElement);
-      });
-      
-      totalContractors += personnel.length;
-      section.appendChild(companyElement);
+  
+  Object.entries(contractorsByCompany).forEach(([companyName, personnel]) => {
+    const companyElement = document.createElement('div');
+    companyElement.className = 'contractor-company';
+    
+    const companyHeader = document.createElement('div');
+    companyHeader.className = 'company-header';
+    companyHeader.textContent = companyName;
+    companyElement.appendChild(companyHeader);
+
+    personnel.forEach((persona, index) => {
+      const personElement = document.createElement('div');
+      personElement.className = 'person';
+      const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
+      personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
+      companyElement.appendChild(personElement);
     });
+    
+    totalContractors += personnel.length;
+    section.appendChild(companyElement);
+  });
 
   // Actualizar el contador en el encabezado de la sección
   const headerElement = section.closest('.section').querySelector('.section-header');
