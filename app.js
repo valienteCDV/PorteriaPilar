@@ -142,4 +142,16 @@ function updateClock() {
   const timeString = now.toLocaleTimeString();
   const dateString = now.toLocaleDateString('es-AR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   document.getElementById('clock').textContent = timeString;
-  document.getElementById('date
+  document.getElementById('date').textContent = dateString;
+}
+
+function init() {
+  loadSheetsData();
+  updateClock();
+  loadWeatherData();
+  setInterval(loadSheetsData, 100000); // Actualizar datos cada 100 segundos
+  setInterval(updateClock, 1000); // Actualizar reloj cada segundo
+  setInterval(loadWeatherData, 600000); // Actualizar clima cada 10 minutos
+}
+
+document.addEventListener('DOMContentLoaded', init);
