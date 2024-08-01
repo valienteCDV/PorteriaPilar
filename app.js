@@ -85,7 +85,7 @@ function processData(data) {
       if (section !== sections.contratistas) {
         const personElement = document.createElement('div');
         personElement.className = 'person';
-        const icon = entry.carga && entry.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : '🚗';
+        const icon = entry.patente ? '🚗' : '';
         personElement.textContent = `${entry.nombreCompleto}${entry.patente ? ` (${icon} ${entry.patente})` : ''}`;
         section.appendChild(personElement);
       }
@@ -111,7 +111,9 @@ function processData(data) {
     if (count > 0) {
       sectionElement.closest('.section').style.display = 'block';
       const headerElement = sectionElement.closest('.section').querySelector('.section-header');
-      headerElement.innerHTML += ` <span class="badge bg-secondary">${count}</span>`;
+      headerElement.innerHTML = `${headerElement.innerHTML.split('<span')[0]} <span class="badge bg-secondary">${count}</span>`;
+    } else {
+      sectionElement.closest('.section').style.display = 'none';
     }
   });
 
@@ -181,6 +183,5 @@ function init() {
   setInterval(updateClock, 1000); // Actualizar reloj cada segundo
   setInterval(loadWeatherData, 600000); // Actualizar clima cada 10 minutos
 }
-
 
 document.addEventListener('DOMContentLoaded', init);
