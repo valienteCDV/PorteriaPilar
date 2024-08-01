@@ -4,11 +4,19 @@ const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.666
 // URL de tu API de Google Apps Script (reemplaza con tu URL real)
 const DATA_API_URL = 'https://script.google.com/macros/s/AKfycbx0G-MiPCDJRmVybfe6Xz70NJVPb3K3NHPcHz3DpGPbVfd8q2tTWZU_PU3Gv01ODbRVKA/exec';
 
+// URL de la API del clima
+const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
+
+// URL de tu API de Google Apps Script (reemplaza con tu URL real)
+const DATA_API_URL = 'https://script.google.com/macros/s/TU_ID_DE_IMPLEMENTACION/exec';
+
 // Función para cargar los datos del dashboard
 function loadDashboardData() {
     fetch(DATA_API_URL)
         .then(response => response.json())
         .then(data => {
+            console.log('Datos recibidos:', data); // Para depuración
+
             document.getElementById('totalPersonas').textContent = data.totalPersonas;
             document.getElementById('camionesGasoil').textContent = data.camionesGasoil;
             
@@ -22,7 +30,7 @@ function loadDashboardData() {
                     <div class="empresa-title">${empresa.nombre} (${empresa.cantidad})</div>
                     ${empresa.personas.map(persona => `
                         <div class="persona-item">
-                            <i class="${persona.carga.toUpperCase() === 'GASOIL' ? 'fas fa-truck' : (persona.patente ? 'fas fa-car' : 'fas fa-user')}"></i>
+                            <i class="${getPersonIcon(persona)}"></i>
                             ${persona.nombre} - ${persona.horaIngreso}
                             ${persona.patente ? ` (${persona.patente})` : ''}
                         </div>
@@ -31,7 +39,21 @@ function loadDashboardData() {
                 empresasContainer.appendChild(empresaCard);
             });
         })
-        .catch(error => console.error('Error loading dashboard data:', error));
+        .catch(error => {
+            console.error('Error loading dashboard data:', error);
+            document.getElementById('empresas-container').innerHTML = '<p>Error al cargar los datos. Por favor, intente nuevamente más tarde.</p>';
+        });
+}
+
+// Función para determinar el icono correcto para cada persona
+function getPersonIcon(persona) {
+    if (persona.carga && persona.carga.toUpperCase().includes('GASOIL')) {
+        return 'fas fa-truck';
+    } else if (persona.patente) {
+        return 'fas fa-car';
+    } else {
+        return 'fas fa-user';
+    }
 }
 
 // Función para cargar los datos del clima
@@ -61,7 +83,10 @@ function loadWeatherData() {
             `;
             document.getElementById('weather-data').innerHTML = weatherHtml;
         })
-        .catch(error => console.error('Error loading weather data:', error));
+        .catch(error => {
+            console.error('Error loading weather data:', error);
+            document.getElementById('weather-data').innerHTML = '<p>Error al cargar datos del clima.</p>';
+        });
 }
 
 // Función para convertir grados a dirección del viento
@@ -72,8 +97,9 @@ function getWindDirection(degrees) {
 
 // Función para actualizar la fecha y hora
 function updateDateTime() {
-    const now = moment();
-    document.querySelector('.header').textContent = `Central Bicentenario - ${now.format('dddd, D [de] MMMM [de] YYYY, HH:mm:ss')}`;
+    const now = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+    document.querySelector('.header').textContent = `Central Bicentenario - ${now.toLocaleDateString('es-ES', options)}`;
 }
 
 // Inicializar y actualizar periódicamente
