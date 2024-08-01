@@ -37,132 +37,104 @@ function loadSheetsData() {
 }
 
 function processData(data) {
-    console.log('Procesando datos...');
+    console.log('Procesando datos:', data);
     const sections = {
         epecBicentenario: document.getElementById('epec-bicentenario'),
         epecEor: document.getElementById('epec-eor'),
         eling: document.getElementById('eling'),
         contratistas: document.getElementById('contratistas'),
-        camiones: document.getElementById('camiones')
+        vehiculos: document.getElementById('vehiculos')
     };
 
-    console.log('Limpiando secciones...');
-    Object.entries(sections).forEach(([key, section]) => {
+    // Limpiar secciones
+    Object.values(sections).forEach(section => {
         if (section) {
             section.innerHTML = '';
             const sectionParent = section.closest('.section');
             if (sectionParent) sectionParent.style.display = 'none';
-        } else {
-            console.warn(`Sección ${key} no encontrada en el DOM`);
         }
     });
 
-    console.log('Procesando personas...');
-    const todasLasPersonas = data.map(row => {
-        console.log('Procesando fila:', row);
-        return {
-            empresa: row.empresa,
-            apellido: row.nombreCompleto.split(' ')[0],
-            nombre: row.nombreCompleto.split(' ').slice(1).join(' '),
-            nombreCompleto: row.nombreCompleto,
-            patente: row.patente,
-            horaIngreso: new Date(row.horaIngreso),
-            horaSalida: row.horaSalida ? new Date(row.horaSalida) : null,
-            carga: row.carga
-        };
-    });
+    let totalPersonas = 0;
+    let totalVehiculos = 0;
+    let personasPorEmpresa = {
+        epecBicentenario: 0,
+        epecEor: 0,
+        eling: 0,
+        contratistas: 0
+    };
 
-    console.log('Filtrando personas adentro...');
-    const personasAdentro = todasLasPersonas.filter(p => !p.horaSalida);
-    console.log('Personas adentro:', personasAdentro.length);
+    let contratistasData = {};
 
-    personasAdentro.sort((a, b) => a.apellido.localeCompare(b.apellido, 'es', { sensitivity: 'base' }));
-
-    let totalPersonas = personasAdentro.length;
-    let totalCamiones = 0;
-
-    const empresasEspeciales = ['EPEC BICENTENARIO', 'ELING', 'EPEC EOR'];
-    const contratistasData = {};
-
-    console.log('Distribuyendo personas en secciones...');
-    personasAdentro.forEach(persona => {
-        console.log('Procesando persona:', persona);
-        let section;
-        if (empresasEspeciales.includes(persona.empresa)) {
-            section = sections[persona.empresa.toLowerCase().replace(' ', '-')];
-        } else {
-            section = sections.contratistas;
-            if (!contratistasData[persona.empresa]) {
-                contratistasData[persona.empresa] = [];
+    data.forEach(entry => {
+        if (entry.empresa !== "EMPRESA / ORGANIZACION") {  // Ignorar la entrada de encabezado
+            let section;
+            if (entry.empresa === 'EPEC BICENTENARIO') {
+                section = sections.epecBicentenario;
+                personasPorEmpresa.epecBicentenario++;
+            } else if (entry.empresa === 'EPEC EOR') {
+                section = sections.epecEor;
+                personasPorEmpresa.epecEor++;
+            } else if (entry.empresa === 'ELING') {
+                section = sections.eling;
+                personasPorEmpresa.eling++;
+            } else {
+                section = sections.contratistas;
+                personasPorEmpresa.contratistas++;
+                if (!contratistasData[entry.empresa]) {
+                    contratistasData[entry.empresa] = [];
+                }
+                contratistasData[entry.empresa].push(entry);
             }
-            contratistasData[persona.empresa].push(persona);
-        }
 
-        if (section && section !== sections.contratistas) {
-            const personElement = document.createElement('div');
-            personElement.className = 'person';
-            const icon = persona.patente ? '🚗' : '';
-            personElement.textContent = `${persona.nombreCompleto}${persona.patente ? ` (${icon} ${persona.patente})` : ''}`;
-            section.appendChild(personElement);
-        }
-
-        if (persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL') {
-            const camionElement = document.createElement('div');
-            camionElement.className = 'person';
-            camionElement.textContent = `${persona.nombreCompleto} (🚛 ${persona.patente || 'N/A'})`;
-            if (sections.camiones) {
-                sections.camiones.appendChild(camionElement);
+            if (section && section !== sections.contratistas) {
+                const personElement = document.createElement('div');
+                personElement.className = 'person';
+                const icon = entry.patente ? '🚗' : '';
+                personElement.textContent = `${entry.nombreCompleto}${entry.patente ? ` (${icon} ${entry.patente})` : ''}`;
+                section.appendChild(personElement);
             }
-            totalCamiones++;
+
+            totalPersonas++;
+
+            if (entry.patente) {
+                const vehicleElement = document.createElement('div');
+                vehicleElement.className = 'vehicle';
+                vehicleElement.textContent = `${entry.nombreCompleto} (🚗 ${entry.patente})`;
+                sections.vehiculos.appendChild(vehicleElement);
+                totalVehiculos++;
+            }
         }
     });
 
-    console.log('Actualizando contadores...');
     document.getElementById('total-personas').textContent = totalPersonas;
-    document.getElementById('total-camiones').textContent = totalCamiones;
+    document.getElementById('total-vehiculos').textContent = totalVehiculos;
 
-    console.log('Actualizando secciones especiales...');
-    empresasEspeciales.forEach(empresa => {
-        const sectionId = empresa.toLowerCase().replace(' ', '-');
-        const sectionElement = document.getElementById(sectionId);
-        if (sectionElement) {
-            const count = sectionElement.childElementCount;
-            console.log(`${empresa}: ${count} personas`);
-            if (count > 0) {
-                sectionElement.closest('.section').style.display = 'block';
-                const headerElement = sectionElement.closest('.section').querySelector('.section-header');
+    // Actualizar contadores y mostrar secciones
+    Object.entries(personasPorEmpresa).forEach(([empresa, count]) => {
+        const sectionElement = document.getElementById(empresa);
+        if (sectionElement && count > 0) {
+            const sectionParent = sectionElement.closest('.section');
+            if (sectionParent) {
+                sectionParent.style.display = 'block';
+                const headerElement = sectionParent.querySelector('.section-header');
                 if (headerElement) {
                     headerElement.innerHTML = `${headerElement.innerHTML.split('<span')[0]} <span class="badge bg-secondary">${count}</span>`;
                 }
             }
-        } else {
-            console.warn(`Sección ${sectionId} no encontrada`);
         }
     });
 
-    console.log('Procesando contratistas...');
     if (Object.keys(contratistasData).length > 0) {
         processContratistas(contratistasData);
-        if (sections.contratistas) {
-            sections.contratistas.closest('.section').style.display = 'block';
-        } else {
-            console.warn('Sección de contratistas no encontrada');
-        }
+        sections.contratistas.closest('.section').style.display = 'block';
     }
 
-    console.log('Actualizando sección de camiones...');
-    if (sections.camiones) {
-        const camionesParent = sections.camiones.closest('.section');
-        if (camionesParent) {
-            camionesParent.style.display = totalCamiones > 0 ? 'block' : 'none';
-        } else {
-            console.warn('Sección padre de camiones no encontrada');
-        }
-    } else {
-        console.warn('Sección de camiones no encontrada');
+    if (sections.vehiculos) {
+        const vehiculosParent = sections.vehiculos.closest('.section');
+        if (vehiculosParent) vehiculosParent.style.display = totalVehiculos > 0 ? 'block' : 'none';
     }
 
-    console.log('Ajustando layout...');
     adjustLayout();
 }
 
