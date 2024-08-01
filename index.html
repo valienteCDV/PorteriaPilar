@@ -46,7 +46,6 @@
         .epec-bicentenario .section-header { background-color: #3cb371; }
         .eling .section-header { background-color: #4169e1; }
         .epec-eor .section-header { background-color: #ffd700; }
-        .camiones .section-header { background-color: #ffa500; }
         .person {
             padding: 8px;
             border-bottom: 1px solid #eee;
@@ -82,62 +81,52 @@
 
     <div class="container-fluid mt-4">
         <div class="row">
-            <div class="col-md-8">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="total-info">
-                            <h2 class="mb-0"><i class="fas fa-users"></i> Personas en Planta: <span id="total-personas" class="badge bg-primary">0</span></h2>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="total-info">
-                            <h2 class="mb-0"><i class="fas fa-truck"></i> Camiones de Gasoil: <span id="total-camiones" class="badge bg-primary">0</span></h2>
-                        </div>
-                    </div>
+            <div class="col-md-4">
+                <div class="total-info">
+                    <h2 class="mb-0"><i class="fas fa-users"></i> Personas en Planta: <span id="total-personas" class="badge bg-primary">0</span></h2>
                 </div>
-                <div class="row">
-                    <div class="col-md-6 col-lg-3">
-                        <div class="section contratistas" id="contratistas">
-                            <div class="section-header">
-                                <i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS
-                            </div>
-                            <div class="section-content"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <div class="section epec-bicentenario" id="epec-bicentenario">
-                            <div class="section-header">
-                                <i class="fas fa-bolt"></i> EPEC BICENTENARIO
-                            </div>
-                            <div class="section-content"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <div class="section eling" id="eling">
-                            <div class="section-header">
-                                <i class="fas fa-industry"></i> ELING
-                            </div>
-                            <div class="section-content"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
-                        <div class="section epec-eor" id="epec-eor">
-                            <div class="section-header">
-                                <i class="fas fa-cogs"></i> EPEC EOR
-                            </div>
-                            <div class="section-content"></div>
-                        </div>
-                    </div>
+            </div>
+            <div class="col-md-4">
+                <div class="total-info">
+                    <h2 class="mb-0"><i class="fas fa-truck"></i> Camiones de Gasoil: <span id="total-camiones" class="badge bg-primary">0</span></h2>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="weather-info">
-                    <h2><i class="fas fa-cloud-sun"></i> Clima en Pilar, Córdoba</h2>
+                    <h3><i class="fas fa-cloud-sun"></i> Clima en Pilar, Córdoba</h3>
                     <div id="weather-data"></div>
                 </div>
-                <div class="section camiones" id="camiones">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="section contratistas" id="contratistas">
                     <div class="section-header">
-                        <i class="fas fa-truck"></i> CAMIONES DE GASOIL
+                        <i class="fas fa-hard-hat"></i> CONTRATISTAS Y VISITAS
+                    </div>
+                    <div class="section-content"></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="section epec-bicentenario" id="epec-bicentenario">
+                    <div class="section-header">
+                        <i class="fas fa-bolt"></i> EPEC BICENTENARIO
+                    </div>
+                    <div class="section-content"></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="section eling" id="eling">
+                    <div class="section-header">
+                        <i class="fas fa-industry"></i> ELING
+                    </div>
+                    <div class="section-content"></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="section epec-eor" id="epec-eor">
+                    <div class="section-header">
+                        <i class="fas fa-cogs"></i> EPEC EOR
                     </div>
                     <div class="section-content"></div>
                 </div>
