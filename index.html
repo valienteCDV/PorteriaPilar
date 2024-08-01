@@ -4,11 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control Ingreso Portería Bicentenario</title>
-    <!-- Enlaces a Bootstrap y Font Awesome para estilos y íconos -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
-        /* Estilos generales */
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #f0f2f5;
@@ -20,7 +18,6 @@
             margin: 0 auto;
         }
         
-        /* Estilos para los paneles de información */
         .info-panel {
             background-color: #ffffff;
             border-radius: 10px;
@@ -28,18 +25,13 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+            height: 100%;
         }
         .info-panel:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
-        .info-panel h2 {
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            color: #0066cc;
-        }
         
-        /* Estilos para las secciones de personal */
         .section {
             background-color: #ffffff;
             border-radius: 10px;
@@ -66,12 +58,10 @@
             max-height: calc(100vh - 250px);
         }
         
-        /* Colores para los encabezados de cada sección */
         .epec-bicentenario .section-header { background-color: #3cb371; }
         .eling .section-header { background-color: #4169e1; }
-        .otros .section-header { background-color: #ff7f50; } /* Color naranja para OTROS */
+        .otros .section-header { background-color: #ff7f50; }
         
-        /* Estilos para las entradas de personal */
         .person {
             padding: 8px;
             border-bottom: 1px solid #eee;
@@ -81,7 +71,6 @@
             border-bottom: none;
         }
              
-        /* Estilos para el reloj y el clima */
         #clock {
             font-size: 2.5rem;
             font-weight: bold;
@@ -90,19 +79,21 @@
         }
         #weather-data {
             font-size: 1.1rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            text-align: center;
+        }
+        #last-update {
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
         }
         
-        /* Estilos para los días sin accidentes */
         #days-without-accidents {
             font-size: 2.5rem;
             font-weight: bold;
             color: #28a745;
         }
         
-        /* Estilos adicionales */
         .badge {
             font-size: 1rem;
             padding: 5px 10px;
@@ -112,7 +103,6 @@
             margin-right: 5px;
         }
 
-        /* Estilos para la sección de otras empresas */
         .other-companies .section-content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -124,6 +114,7 @@
             border-radius: 8px;
             padding: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
         }
         
         .company-card h3 {
@@ -131,6 +122,24 @@
             margin-bottom: 10px;
             padding-bottom: 5px;
             border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .indicator-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        #accident-calendar {
+            margin-top: 15px;
+            /* Estilos para el futuro calendario */
         }
     </style>
 </head>
@@ -138,33 +147,36 @@
     <div class="dashboard-container">
         <!-- Fila superior con información general -->
         <div class="row g-3">
-            <!-- Panel de Personas en Planta -->
-            <div class="col-md-3">
-                <div class="info-panel">
-                    <h2><i class="fas fa-users"></i> Personas en Planta</h2>
-                    <span id="total-personas" class="badge bg-primary">0</span>
-                </div>
-            </div>
-            <!-- Panel de Camiones de Gasoil -->
-            <div class="col-md-3">
-                <div class="info-panel">
-                    <h2><i class="fas fa-truck"></i> Camiones de Gasoil</h2>
-                    <span id="total-camiones" class="badge bg-success">0</span>
-                </div>
-            </div>
-            <!-- Panel de Reloj y Clima -->
-            <div class="col-md-3">
+            <!-- Panel de Reloj, Clima y Última Actualización -->
+            <div class="col-md-4">
                 <div class="info-panel">
                     <div id="clock"></div>
                     <div id="weather-data"></div>
+                    <div id="last-update">Última actualización: <span id="update-time"></span></div>
+                </div>
+            </div>
+            <!-- Panel de Personas en Planta y Camiones de Gasoil -->
+            <div class="col-md-4">
+                <div class="info-panel">
+                    <div class="indicator">
+                        <h2><i class="fas fa-users"></i> Personas en Planta</h2>
+                        <span id="total-personas" class="indicator-value badge bg-primary">0</span>
+                    </div>
+                    <div class="indicator">
+                        <h2><i class="fas fa-truck"></i> Camiones de Gasoil</h2>
+                        <span id="total-camiones" class="indicator-value badge bg-success">0</span>
+                    </div>
                 </div>
             </div>
             <!-- Panel de Días sin accidentes -->
-            <div class="col-md-3">
+            <div class="col-md-4">
                 <div class="info-panel text-center">
                     <h2>Días sin accidentes</h2>
                     <div id="days-without-accidents"></div>
                     <small id="last-accident-date"></small>
+                    <div id="accident-calendar">
+                        <!-- Aquí irá el calendario de accidentes -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -206,7 +218,6 @@
         </div>
     </div>
 
-    <!-- Enlace al archivo JavaScript principal -->
     <script src="app.js"></script>
 </body>
 </html>
