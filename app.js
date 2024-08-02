@@ -110,4 +110,84 @@ function displayCompanyPersonnel(section, personas) {
     const personElement = document.createElement('div');
     personElement.className = 'person';
     const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
-    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${
+    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
+    fragment.appendChild(personElement);
+  });
+  section.appendChild(fragment);
+}
+
+function createCompanyCard(companyName, personas) {
+  if (!companyName || !Array.isArray(personas)) return null;
+  const card = document.createElement('div');
+  card.className = 'company-card';
+  card.innerHTML = `<h3>${companyName} <span class="badge bg-secondary">${personas.length}</span></h3>`;
+  const personList = document.createElement('div');
+  personas.sort((a, b) => a.nombre.localeCompare(b.nombre)).forEach((persona, index) => {
+    const personElement = document.createElement('div');
+    personElement.className = 'person';
+    const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
+    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
+    personList.appendChild(personElement);
+  });
+  card.appendChild(personList);
+  return card;
+}
+
+function updateClockAndDate() {
+  const now = new Date();
+  const weekdays = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  const clockDateElement = document.getElementById('clock-date');
+  
+  clockDateElement.querySelector('.weekday').textContent = weekdays[now.getDay()];
+  clockDateElement.querySelector('.date').textContent = now.toLocaleDateString('es-AR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit'
+  });
+  clockDateElement.querySelector('.time').textContent = now.toLocaleTimeString('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+}
+
+function updateLastUpdateTime() {
+  const now = new Date();
+  document.getElementById('update-time').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+}
+
+function updateAccidentCalendar() {
+  fetch(WEBAPP_URL)
+    .then(response => response.json())
+    .then(data => {
+      if (data.ultimoAccidente) {
+        const lastAccidentDate = new Date(data.ultimoAccidente);
+        const today = new Date();
+        const daysSinceLastAccident = Math.floor((today - lastAccidentDate) / (1000 * 60 * 60 * 24));
+        document.getElementById('days-without-accidents').textContent = daysSinceLastAccident;
+        document.getElementById('last-accident-date').textContent = `Último accidente: ${lastAccidentDate.toLocaleDateString('es-AR')}`;
+      } else {
+        document.getElementById('days-without-accidents').textContent = 'N/A';
+        document.getElementById('last-accident-date').textContent = 'No hay datos disponibles';
+      }
+    })
+    .catch(error => {
+      console.error('Error al cargar datos de accidentes:', error);
+      document.getElementById('days-without-accidents').textContent = 'Error';
+      document.getElementById('last-accident-date').textContent = 'Error al cargar datos';
+    });
+}
+
+function init() {
+  updateClockAndDate();
+  loadWeatherData();
+  loadSheetsData();
+  updateAccidentCalendar();
+  setInterval(updateClockAndDate, 1000);
+  setInterval(loadWeatherData, 600000); // Cada 10 minutos
+  setInterval(loadSheetsData, 300000); // Cada 5 minutos
+  setInterval(updateAccidentCalendar, 3600000); // Cada hora
+}
+
+document.addEventListener('DOMContentLoaded', init);
