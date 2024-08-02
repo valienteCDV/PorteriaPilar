@@ -198,7 +198,7 @@ function createCompanyCard(companyName, personas) {
  */
 function updateClock() {
     const now = new Date();
-    document.getElementById('clock').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    document.getElementById('clock').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 }
 
 /**
@@ -206,8 +206,9 @@ function updateClock() {
  */
 function updateLastUpdateTime() {
     const now = new Date();
-    document.getElementById('update-time').textContent = now.toLocaleString('es-AR');
+    document.getElementById('update-time').textContent = now.toLocaleString('es-AR', { hour12: false });
 }
+
 
 /**
  * Actualiza el calendario de accidentes
