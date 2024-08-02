@@ -17,9 +17,9 @@ function loadWeatherData() {
 
 function updateWeatherDisplay(weather, humidity) {
   const weatherHtml = `
-    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C</div>
-    <div><span class="weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
-    <div><span class="weather-icon"><i class="fas fa-wind"></i></span>${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h</div>
+    <div><i class="fas fa-thermometer-half"></i> ${weather.temperature}°C</div>
+    <div><i class="fas fa-tint"></i> ${humidity}%</div>
+    <div><i class="fas fa-wind"></i> ${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h</div>
   `;
   document.getElementById('weather-data').innerHTML = weatherHtml;
 }
@@ -110,69 +110,4 @@ function displayCompanyPersonnel(section, personas) {
     const personElement = document.createElement('div');
     personElement.className = 'person';
     const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
-    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
-    fragment.appendChild(personElement);
-  });
-  section.appendChild(fragment);
-}
-
-function createCompanyCard(companyName, personas) {
-  if (!companyName || !Array.isArray(personas)) return null;
-  const card = document.createElement('div');
-  card.className = 'company-card';
-  card.innerHTML = `<h3>${companyName} <span class="badge bg-secondary">${personas.length}</span></h3>`;
-  const personList = document.createElement('div');
-  personas.sort((a, b) => a.nombre.localeCompare(b.nombre)).forEach((persona, index) => {
-    const personElement = document.createElement('div');
-    personElement.className = 'person';
-    const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
-    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
-    personList.appendChild(personElement);
-  });
-  card.appendChild(personList);
-  return card;
-}
-
-function updateClock() {
-  const now = new Date();
-  document.getElementById('clock').textContent = now.toLocaleString('es-AR', {
-    day: '2-digit', month: '2-digit', year: '2-digit',
-    hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-  }).replace(',', '');
-}
-
-function updateLastUpdateTime() {
-  const now = new Date();
-  document.getElementById('update-time').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-}
-
-function updateAccidentCalendar() {
-  fetch(WEBAPP_URL)
-    .then(response => response.json())
-    .then(data => {
-      if (data.ultimoAccidente) {
-        const lastAccidentDate = new Date(data.ultimoAccidente);
-        const today = new Date();
-        const daysSinceLastAccident = Math.floor((today - lastAccidentDate) / (1000 * 60 * 60 * 24));
-        document.getElementById('days-without-accidents').textContent = daysSinceLastAccident;
-        document.getElementById('last-accident-date').textContent = `Último accidente: ${lastAccidentDate.toLocaleDateString('es-AR')}`;
-      }
-    })
-    .catch(error => {
-      document.getElementById('days-without-accidents').textContent = 'Error';
-      document.getElementById('last-accident-date').textContent = 'Error al cargar datos';
-    });
-}
-
-function init() {
-  updateClock();
-  loadWeatherData();
-  loadSheetsData();
-  updateAccidentCalendar();
-  setInterval(updateClock, 1000);
-  setInterval(loadWeatherData, 600000);
-  setInterval(loadSheetsData, 300000);
-  setInterval(updateAccidentCalendar, 86400000);
-}
-
-document.addEventListener('DOMContentLoaded', init);
+    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${
