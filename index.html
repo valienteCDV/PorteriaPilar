@@ -17,150 +17,209 @@
             max-width: 1800px;
             margin: 0 auto;
         }
-        .info-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
-            border-radius: 15px;
-            padding: 20px;
+        
+        .info-panel {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 15px;
             margin-bottom: 20px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
         }
-        .info-card:hover {
+        .info-panel:hover {
             transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
-        .info-card-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
+        
+        .section {
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            height: calc(100% - 20px);
+            transition: all 0.3s ease;
         }
-        .info-card-header i {
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .section-header {
+            padding: 15px;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            font-size: 1.1rem;
+        }
+        .section-content {
+            padding: 15px;
+            overflow-y: auto;
+            max-height: calc(100vh - 250px);
+        }
+        
+        .epec-bicentenario .section-header { background-color: #3cb371; }
+        .eling .section-header { background-color: #4169e1; }
+        .otros .section-header { background-color: #ff7f50; }
+        
+        .person {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9rem;
+        }
+        .person:last-child {
+            border-bottom: none;
+        }
+             
+        #clock {
             font-size: 2.5rem;
-            margin-right: 15px;
-            background: -webkit-linear-gradient(45deg, #1a73e8, #34a853);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .info-card-header h3 {
-            font-size: 1.2rem;
-            margin: 0;
-            color: #333;
-        }
-        .info-card-content {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        #clock-date .weekday {
-            font-size: 1.2rem;
-            color: #666;
-        }
-        #clock-date .date {
-            font-size: 1.8rem;
             font-weight: bold;
-            color: #1a73e8;
-        }
-        #clock-date .time {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #34a853;
-        }
-        .indicator-value {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #1a73e8;
-        }
-        #days-without-accidents {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #34a853;
+            text-align: center;
+            margin-bottom: 10px;
         }
         #weather-data {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        #last-update {
+            font-size: 0.8rem;
+            text-align: center;
+            margin-top: 10px;
+            color: #666;
+        }
+        
+        #days-without-accidents {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .badge {
+            font-size: 1rem;
+            padding: 5px 10px;
+        }
+        .weather-icon {
+            font-size: 1.5rem;
+            margin-right: 5px;
+        }
+
+        .other-companies .section-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .company-card {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .company-card h3 {
+            font-size: 1rem;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+
+        .indicator {
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
         }
-        #weather-data i {
+
+        .indicator-value {
             font-size: 1.5rem;
-            margin-right: 10px;
-            color: #1a73e8;
+            font-weight: bold;
         }
-        /* ... (resto de los estilos) ... */
+
+        #accident-calendar {
+            margin-top: 15px;
+            /* Estilos para el futuro calendario */
+        }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
-        <div class="row g-4">
-            <!-- Tarjeta de Fecha y Hora -->
-            <div class="col-md-3">
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <i class="fas fa-clock"></i>
-                        <h3>Fecha y Hora</h3>
-                    </div>
-                    <div class="info-card-content" id="clock-date">
-                        <div class="weekday"></div>
-                        <div class="date"></div>
-                        <div class="time"></div>
-                    </div>
+        <!-- Fila superior con información general -->
+        <div class="row g-3">
+            <!-- Panel de Reloj, Clima y Última Actualización -->
+            <div class="col-md-4">
+                <div class="info-panel">
+                    <div id="clock"></div>
+                    <div id="weather-data"></div>
+                    
                 </div>
             </div>
-            <!-- Tarjeta de Personas en Planta y Camiones de Gasoil -->
-            <div class="col-md-3">
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <i class="fas fa-users"></i>
-                        <h3>Personal y Vehículos</h3>
+            <!-- Panel de Personas en Planta y Camiones de Gasoil -->
+            <div class="col-md-4">
+                <div class="info-panel">
+                    <div class="indicator">
+                        <h2><i class="fas fa-users"></i> Personas en Planta</h2>
+                        <span id="total-personas" class="indicator-value badge bg-primary">0</span>
                     </div>
-                    <div class="info-card-content">
-                        <div class="mb-3">
-                            <span>Personas en Planta:</span>
-                            <span id="total-personas" class="indicator-value">0</span>
-                        </div>
-                        <div>
-                            <span>Camiones de Gasoil:</span>
-                            <span id="total-camiones" class="indicator-value">0</span>
-                        </div>
+                    <div class="indicator">
+                        <h2><i class="fas fa-truck"></i> Camiones de Gasoil</h2>
+                        <span id="total-camiones" class="indicator-value badge bg-success">0</span>
                     </div>
-                    <div id="last-update" class="text-muted">Última actualización: <span id="update-time"></span></div>
+<div id="last-update">Última actualización: <span id="update-time"></span></div>
                 </div>
             </div>
-            <!-- Tarjeta de Días sin accidentes -->
-            <div class="col-md-3">
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <i class="fas fa-calendar-check"></i>
-                        <h3>Seguridad</h3>
-                    </div>
-                    <div class="info-card-content text-center">
-                        <div>Días sin accidentes</div>
-                        <div id="days-without-accidents">N/A</div>
-                        <small id="last-accident-date" class="text-muted">No hay datos disponibles</small>
-                    </div>
-                </div>
-            </div>
-            <!-- Tarjeta del Clima -->
-            <div class="col-md-3">
-                <div class="info-card">
-                    <div class="info-card-header">
-                        <i class="fas fa-cloud-sun"></i>
-                        <h3>Clima en Central Bicentenario</h3>
-                    </div>
-                    <div class="info-card-content" id="weather-data">
-                        <!-- El contenido se llenará dinámicamente -->
+            <!-- Panel de Días sin accidentes -->
+            <div class="col-md-4">
+                <div class="info-panel text-center">
+                    <h2>Días sin accidentes</h2>
+                    <div id="days-without-accidents"></div>
+                    <small id="last-accident-date"></small>
+                    <div id="accident-calendar">
+                        <!-- Aquí irá el calendario de accidentes -->
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- ... (resto del HTML para las secciones de personal) ... -->
+        <!-- Fila inferior con secciones de personal -->
+        <div class="row g-3 mt-2">
+            <!-- Sección de EPEC BICENTENARIO -->
+            <div class="col-md-4">
+                <div class="section epec-bicentenario" id="epec-bicentenario">
+                    <div class="section-header">
+                        <i class="fas fa-bolt"></i> EPEC BICENTENARIO
+                        <span class="badge bg-secondary">0 (0%)</span>
+                    </div>
+                    <div class="section-content"></div>
+                </div>
+            </div>
+            <!-- Sección de ELING -->
+            <div class="col-md-4">
+                <div class="section eling" id="eling">
+                    <div class="section-header">
+                        <i class="fas fa-industry"></i> ELING
+                        <span class="badge bg-secondary">0 (0%)</span>
+                    </div>
+                    <div class="section-content"></div>
+                </div>
+            </div>
+            <!-- Sección de OTROS (Otras Empresas) -->
+            <div class="col-md-4">
+                <div class="section otros" id="other-companies">
+                    <div class="section-header">
+                        <i class="fas fa-hard-hat"></i> OTROS
+                        <span class="badge bg-secondary">0 (0%)</span>
+                    </div>
+                    <div class="section-content">
+                        <!-- Aquí se agregarán dinámicamente las tarjetas de otras empresas -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="app.js"></script>
 </body>
 </html>
+
