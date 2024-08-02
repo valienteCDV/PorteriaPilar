@@ -24,7 +24,6 @@
             margin-bottom: 20px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
-            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -32,6 +31,10 @@
         .info-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .info-card-floating {
+            position: relative;
+            z-index: 1;
         }
         .section {
             background-color: #ffffff;
@@ -72,16 +75,8 @@
         #clock-date {
             text-align: center;
         }
-        #clock-date .weekday {
+        #clock-date .weekday, #clock-date .date, #clock-date .time {
             font-size: 2rem;
-        }
-        #clock-date .date {
-            font-size: 2rem;
-     
-        }
-        #clock-date .time {
-            font-size: 2rem;
-            
         }
         #weather-data {
             font-size: 1.1rem;
@@ -155,7 +150,7 @@
                 </div>
             </div>
             <!-- Tarjeta de Personas en Planta y Camiones de Gasoil -->
-            <div class="col-md-3">
+            <div class="col-md-3 info-card-floating">
                 <div class="info-card">
                     <div class="indicator">
                         <h3><i class="fas fa-users"></i> Personas en Planta</h3>
@@ -169,7 +164,7 @@
                 </div>
             </div>
             <!-- Tarjeta de Días sin accidentes -->
-            <div class="col-md-3">
+            <div class="col-md-3 info-card-floating">
                 <div class="info-card text-center">
                     <h3>Días sin accidentes</h3>
                     <div id="days-without-accidents" class="indicator-value"></div>
@@ -177,7 +172,7 @@
                 </div>
             </div>
             <!-- Tarjeta del Clima -->
-            <div class="col-md-3">
+            <div class="col-md-3 info-card-floating">
                 <div class="info-card">
                     <h3>Clima en Central Bicentenario</h3>
                     <div id="weather-data"></div>
