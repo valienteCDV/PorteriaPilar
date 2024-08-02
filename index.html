@@ -1,222 +1,244 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Ingreso Portería Bicentenario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f0f2f5;
-            color: #333;
-        }
-        .dashboard-container {
-            padding: 20px;
-            max-width: 1800px;
-            margin: 0 auto;
-        }
-        .info-card {
-            background-color: #ffffff;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        .info-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-        .info-card-floating {
-            position: relative;
-            z-index: 1;
-        }
-        .section {
-            background-color: #ffffff;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            height: calc(100% - 20px);
-            transition: all 0.3s ease;
-        }
-        .section:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-        .section-header {
-            padding: 15px;
-            font-weight: bold;
-            text-align: center;
-            color: white;
-            font-size: 1.1rem;
-        }
-        .section-content {
-            padding: 15px;
-            overflow-y: auto;
-            max-height: calc(100vh - 250px);
-        }
-        .epec-bicentenario .section-header { background-color: #3cb371; }
-        .eling .section-header { background-color: #4169e1; }
-        .otros .section-header { background-color: #ff7f50; }
-        .person {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-            font-size: 0.9rem;
-        }
-        .person:last-child {
-            border-bottom: none;
-        }
-        #clock-date {
-            text-align: center;
-        }
-        #clock-date .weekday, #clock-date .date, #clock-date .time {
-            font-size: 2rem;
-        }
-        #weather-data {
-            font-size: 1.1rem;
-            text-align: center;
-        }
-        #last-update {
-            font-size: 0.8rem;
-            text-align: center;
-            margin-top: 10px;
-            color: #666;
-        }
-        #days-without-accidents {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #28a745;
-        }
-        .badge {
-            font-size: 1rem;
-            padding: 5px 10px;
-        }
-        .weather-icon {
-            font-size: 1.5rem;
-            margin-right: 5px;
-        }
-        .other-companies .section-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-        }
-        .company-card {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin-bottom: 15px;
-        }
-        .company-card h3 {
-            font-size: 1rem;
-            margin-bottom: 10px;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #eee;
-            text-align: center;
-        }
-        .indicator {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .indicator-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-        #accident-calendar {
-            margin-top: 15px;
-        }
-    </style>
-</head>
-<body>
-    <div class="dashboard-container">
-        <!-- Fila superior con información general -->
-        <div class="row g-3">
-            <!-- Tarjeta de Fecha y Hora -->
-            <div class="col-md-3">
-                <div class="info-card">
-                    <div id="clock-date">
-                        <div class="weekday"></div>
-                        <div class="date"></div>
-                        <div class="time"></div>
-                    </div>
-                </div>
-            </div>
-            <!-- Tarjeta de Personas en Planta y Camiones de Gasoil -->
-            <div class="col-md-3 info-card-floating">
-                <div class="info-card">
-                    <div class="indicator">
-                        <h3><i class="fas fa-users"></i> Personas en Planta</h3>
-                        <span id="total-personas" class="indicator-value badge bg-primary">0</span>
-                    </div>
-                    <div class="indicator">
-                        <h3><i class="fas fa-truck"></i> Camiones de Gasoil</h3>
-                        <span id="total-camiones" class="indicator-value badge bg-success">0</span>
-                    </div>
-                    <div id="last-update">Última actualización: <span id="update-time"></span></div>
-                </div>
-            </div>
-            <!-- Tarjeta de Días sin accidentes -->
-            <div class="col-md-3 info-card-floating">
-                <div class="info-card text-center">
-                    <h3>Días sin accidentes</h3>
-                    <div id="days-without-accidents" class="indicator-value"></div>
-                    <small id="last-accident-date"></small>
-                </div>
-            </div>
-            <!-- Tarjeta del Clima -->
-            <div class="col-md-3 info-card-floating">
-                <div class="info-card">
-                    <h3>Clima en Central Bicentenario</h3>
-                    <div id="weather-data"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Fila inferior con secciones de personal -->
-        <div class="row g-3 mt-2">
-            <!-- Sección de EPEC BICENTENARIO -->
-            <div class="col-md-4">
-                <div class="section epec-bicentenario" id="epec-bicentenario">
-                    <div class="section-header">
-                        <i class="fas fa-bolt"></i> EPEC BICENTENARIO
-                        <span class="badge bg-secondary">0 (0%)</span>
-                    </div>
-                    <div class="section-content"></div>
-                </div>
-            </div>
-            <!-- Sección de ELING -->
-            <div class="col-md-4">
-                <div class="section eling" id="eling">
-                    <div class="section-header">
-                        <i class="fas fa-industry"></i> ELING
-                        <span class="badge bg-secondary">0 (0%)</span>
-                    </div>
-                    <div class="section-content"></div>
-                </div>
-            </div>
-            <!-- Sección de OTROS (Otras Empresas) -->
-            <div class="col-md-4">
-                <div class="section otros" id="other-companies">
-                    <div class="section-header">
-                        <i class="fas fa-hard-hat"></i> OTROS
-                        <span class="badge bg-secondary">0 (0%)</span>
-                    </div>
-                    <div class="section-content">
-                        <!-- Aquí se agregarán dinámicamente las tarjetas de otras empresas -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+// URLs para las APIs
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbx0G-MiPCDJRmVybfe6Xz70NJVPb3K3NHPcHz3DpGPbVfd8q2tTWZU_PU3Gv01ODbRVKA/exec';
+const WEATHER_API_URL = 'https://api.open-meteo.com/v1/forecast?latitude=-31.6667&longitude=-63.8833&current_weather=true&hourly=temperature_2m,relativehumidity_2m,windspeed_10m';
 
-    <script src="app.js"></script>
-</body>
-</html>
+/**
+ * Carga los datos meteorológicos de la API
+ */
+function loadWeatherData() {
+  fetch(WEATHER_API_URL)
+    .then(response => response.json())
+    .then(data => {
+      const currentWeather = data.current_weather;
+      const currentHour = new Date().getHours();
+      updateWeatherDisplay(currentWeather, data.hourly.relativehumidity_2m[currentHour]);
+    })
+    .catch(error => console.error('Error loading weather data:', error));
+}
+
+/**
+ * Actualiza la visualización del clima en el dashboard
+ * @param {Object} weather - Datos del clima actual
+ * @param {number} humidity - Humedad actual
+ */
+function updateWeatherDisplay(weather, humidity) {
+  const weatherHtml = `
+    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C</div>
+    <div><span class="weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
+    <div><span class="weather-icon"><i class="fas fa-wind"></i></span>${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h</div>
+  `;
+  document.getElementById('weather-data').innerHTML = weatherHtml;
+}
+
+/**
+ * Obtiene la dirección del viento basada en los grados
+ * @param {number} degrees - Grados de dirección del viento
+ * @returns {string} Dirección del viento en texto
+ */
+function getWindDirection(degrees) {
+  const directions = ['Norte', 'NorEste', 'Este', 'SudEste', 'Sur', 'SudOeste', 'Oeste', 'NorOeste'];
+  return directions[Math.round(degrees / 45) % 8];
+}
+
+/**
+ * Carga los datos de la hoja de cálculo desde la API de Google Apps Script
+ */
+function loadSheetsData() {
+  console.log('Iniciando carga de datos...');
+  fetch(WEBAPP_URL)
+    .then(response => response.json())
+    .then(data => {
+      console.log('Datos recibidos:', data);
+      processData(data);
+    })
+    .catch(error => console.error('Error loading data:', error));
+}
+
+/**
+ * Procesa los datos recibidos y actualiza el dashboard
+ * @param {Object} data - Datos recibidos de la API
+ */
+function processData(data) {
+  console.log('Procesando datos:', data);
+  if (!data || !data.empresas || !Array.isArray(data.empresas)) {
+    console.error('Formato de datos inválido:', data);
+    return;
+  }
+
+  const sections = {
+    epecBicentenario: document.querySelector('#epec-bicentenario .section-content'),
+    eling: document.querySelector('#eling .section-content'),
+    otherCompanies: document.querySelector('#other-companies .section-content')
+  };
+
+  // Verificar que todos los elementos existan
+  for (const [key, element] of Object.entries(sections)) {
+    if (!element) {
+      console.error(`Elemento no encontrado: ${key}`);
+      return;
+    }
+  }
+
+  // Limpiar contenido existente
+  Object.values(sections).forEach(section => section.innerHTML = '');
+
+  let totalPersonas = 0;
+  let totalCamiones = 0;
+  let companyData = {
+    epecBicentenario: { count: 0, personas: [] },
+    eling: { count: 0, personas: [] },
+    others: {}
+  };
+
+  // Procesar datos de cada empresa
+  data.empresas.forEach(empresa => {
+    if (empresa && typeof empresa.cantidad === 'number') {
+      totalPersonas += empresa.cantidad;
+    }
+    if (empresa.personas && Array.isArray(empresa.personas)) {
+      totalCamiones += empresa.personas.filter(p => p.carga && p.carga.toString().toUpperCase().trim() === 'GASOIL').length;
+
+      if (empresa.nombre === 'EPEC BICENTENARIO') {
+        companyData.epecBicentenario.count = empresa.cantidad;
+        companyData.epecBicentenario.personas = empresa.personas;
+      } else if (empresa.nombre === 'ELING') {
+        companyData.eling.count = empresa.cantidad;
+        companyData.eling.personas = empresa.personas;
+      } else {
+        companyData.others[empresa.nombre] = {
+          count: empresa.cantidad,
+          personas: empresa.personas
+        };
+      }
+    }
+  });
+
+  // Mostrar datos de cada empresa
+  displayCompanyPersonnel(sections.epecBicentenario, companyData.epecBicentenario.personas);
+  updateSectionHeader('epec-bicentenario', companyData.epecBicentenario.count, totalPersonas);
+
+  displayCompanyPersonnel(sections.eling, companyData.eling.personas);
+  updateSectionHeader('eling', companyData.eling.count, totalPersonas);
+
+  let otherCompaniesCount = 0;
+  Object.entries(companyData.others).forEach(([companyName, company]) => {
+    const companyCard = createCompanyCard(companyName, company.personas);
+    sections.otherCompanies.appendChild(companyCard);
+    otherCompaniesCount += company.count;
+  });
+  updateSectionHeader('other-companies', otherCompaniesCount, totalPersonas);
+
+  // Actualizar totales
+  document.getElementById('total-personas').textContent = totalPersonas;
+  document.getElementById('total-camiones').textContent = totalCamiones;
+
+  // Actualizar tiempo de última actualización
+  updateLastUpdateTime();
+}
+
+/**
+ * Actualiza el encabezado de una sección con el conteo y porcentaje
+ * @param {string} sectionId - ID de la sección a actualizar
+ * @param {number} count - Cantidad de personas en la sección
+ * @param {number} total - Total de personas en todas las secciones
+ */
+function updateSectionHeader(sectionId, count, total) {
+  const headerElement = document.querySelector(`#${sectionId} .section-header .badge`);
+  if (headerElement) {
+    const percentage = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+    headerElement.textContent = `${count} (${percentage}%)`;
+  }
+}
+
+/**
+ * Muestra el personal de una empresa en su sección correspondiente
+ * @param {HTMLElement} section - Elemento donde mostrar el personal
+ * @param {Array} personas - Array de personas a mostrar
+ */
+function displayCompanyPersonnel(section, personas) {
+  if (!section || !Array.isArray(personas)) return;
+
+  personas.sort((a, b) => a.nombre.localeCompare(b.nombre));
+  personas.forEach((persona, index) => {
+    const personElement = document.createElement('div');
+    personElement.className = 'person';
+    const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
+    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
+    section.appendChild(personElement);
+  });
+}
+
+/**
+ * Crea una tarjeta para una empresa en la sección "Otros"
+ * @param {string} companyName - Nombre de la empresa
+ * @param {Array} personas - Array de personas de la empresa
+ * @returns {HTMLElement} Elemento de tarjeta de empresa
+ */
+function createCompanyCard(companyName, personas) {
+  if (!companyName || !Array.isArray(personas)) return null;
+
+  const card = document.createElement('div');
+  card.className = 'company-card';
+  card.innerHTML = `<h3>${companyName} <span class="badge bg-secondary">${personas.length}</span></h3>`;
+  
+  personas.sort((a, b) => a.nombre.localeCompare(b.nombre));
+  personas.forEach((persona, index) => {
+    const personElement = document.createElement('div');
+    personElement.className = 'person';
+    const icon = persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL' ? '🚛' : (persona.patente ? '🚗' : '');
+    personElement.textContent = `${index + 1}. ${persona.nombre}${persona.patente ? ` (${icon}${persona.patente})` : ''}`;
+    card.appendChild(personElement);
+  });
+
+  return card;
+}
+
+/**
+ * Actualiza el reloj y la fecha de última actualización
+ */
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+}
+
+/**
+ * Actualiza la hora de la última actualización de datos
+ */
+function updateLastUpdateTime() {
+    const now = new Date();
+    document.getElementById('update-time').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+}
+
+
+
+/**
+ * Actualiza el calendario de accidentes
+ */
+function updateAccidentCalendar() {
+    const lastAccidentDate = new Date('2019-12-17');
+    const today = new Date();
+    const daysSinceLastAccident = Math.floor((today - lastAccidentDate) / (1000 * 60 * 60 * 24));
+    
+    document.getElementById('days-without-accidents').textContent = daysSinceLastAccident;
+    document.getElementById('last-accident-date').textContent = `Último accidente: ${lastAccidentDate.toLocaleDateString('es-AR')}`;
+    
+    // Aquí iría la lógica para generar el calendario visual
+    // Por ahora, solo mostraremos el número de días
+}
+
+/**
+ * Inicializa la aplicación y configura las actualizaciones periódicas
+ */
+function init() {
+    updateClock();
+    updateAccidentCalendar();
+    loadWeatherData();
+    loadSheetsData();
+    setInterval(updateClock, 1000);
+    setInterval(loadWeatherData, 600000); // Cada 10 minutos
+    setInterval(loadSheetsData, 300000); // Cada 5 minutos
+    setInterval(updateAccidentCalendar, 86400000); // Cada día
+}
+
+// Iniciar la aplicación cuando el DOM esté completamente cargado
+document.addEventListener('DOMContentLoaded', init);
