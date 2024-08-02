@@ -17,8 +17,7 @@
             max-width: 1800px;
             margin: 0 auto;
         }
-        
-        .info-panel {
+        .info-card {
             background-color: #ffffff;
             border-radius: 10px;
             padding: 15px;
@@ -26,12 +25,14 @@
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
             height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-        .info-panel:hover {
+        .info-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 6px 12px rgba(0,0,0,0.15);
         }
-        
         .section {
             background-color: #ffffff;
             border-radius: 10px;
@@ -57,11 +58,9 @@
             overflow-y: auto;
             max-height: calc(100vh - 250px);
         }
-        
         .epec-bicentenario .section-header { background-color: #3cb371; }
         .eling .section-header { background-color: #4169e1; }
         .otros .section-header { background-color: #ff7f50; }
-        
         .person {
             padding: 8px;
             border-bottom: 1px solid #eee;
@@ -70,12 +69,19 @@
         .person:last-child {
             border-bottom: none;
         }
-             
-        #clock {
-            font-size: 2.5rem;
-            font-weight: bold;
+        #clock-date {
             text-align: center;
-            margin-bottom: 10px;
+        }
+        #clock-date .weekday {
+            font-size: 1.2rem;
+        }
+        #clock-date .date {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        #clock-date .time {
+            font-size: 2rem;
+            font-weight: bold;
         }
         #weather-data {
             font-size: 1.1rem;
@@ -87,13 +93,11 @@
             margin-top: 10px;
             color: #666;
         }
-        
         #days-without-accidents {
             font-size: 2.5rem;
             font-weight: bold;
             color: #28a745;
         }
-        
         .badge {
             font-size: 1rem;
             padding: 5px 10px;
@@ -102,13 +106,11 @@
             font-size: 1.5rem;
             margin-right: 5px;
         }
-
         .other-companies .section-content {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
         }
-        
         .company-card {
             background-color: #f8f9fa;
             border-radius: 8px;
@@ -116,7 +118,6 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             margin-bottom: 15px;
         }
-        
         .company-card h3 {
             font-size: 1rem;
             margin-bottom: 10px;
@@ -124,22 +125,18 @@
             border-bottom: 1px solid #eee;
             text-align: center;
         }
-
         .indicator {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 10px;
         }
-
         .indicator-value {
             font-size: 1.5rem;
             font-weight: bold;
         }
-
         #accident-calendar {
             margin-top: 15px;
-            /* Estilos para el futuro calendario */
         }
     </style>
 </head>
@@ -147,37 +144,46 @@
     <div class="dashboard-container">
         <!-- Fila superior con información general -->
         <div class="row g-3">
-            <!-- Panel de Reloj, Clima y Última Actualización -->
-            <div class="col-md-4">
-                <div class="info-panel">
-                    <div id="clock"></div>
-                    <div id="weather-data"></div>
-                    
+            <!-- Tarjeta de Fecha y Hora -->
+            <div class="col-md-3">
+                <div class="info-card">
+                    <div id="clock-date">
+                        <div class="icon"><i class="fas fa-clock"></i></div>
+                        <div class="weekday"></div>
+                        <div class="date"></div>
+                        <div class="time"></div>
+                    </div>
                 </div>
             </div>
-            <!-- Panel de Personas en Planta y Camiones de Gasoil -->
-            <div class="col-md-4">
-                <div class="info-panel">
+            <!-- Tarjeta de Personas en Planta y Camiones de Gasoil -->
+            <div class="col-md-3">
+                <div class="info-card">
                     <div class="indicator">
-                        <h2><i class="fas fa-users"></i> Personas en Planta</h2>
+                        <h3><i class="fas fa-users"></i> Personas en Planta</h3>
                         <span id="total-personas" class="indicator-value badge bg-primary">0</span>
                     </div>
                     <div class="indicator">
-                        <h2><i class="fas fa-truck"></i> Camiones de Gasoil</h2>
+                        <h3><i class="fas fa-truck"></i> Camiones de Gasoil</h3>
                         <span id="total-camiones" class="indicator-value badge bg-success">0</span>
                     </div>
-<div id="last-update">Última actualización: <span id="update-time"></span></div>
+                    <div id="last-update">Última actualización: <span id="update-time"></span></div>
                 </div>
             </div>
-            <!-- Panel de Días sin accidentes -->
-            <div class="col-md-4">
-                <div class="info-panel text-center">
-                    <h2>Días sin accidentes</h2>
-                    <div id="days-without-accidents"></div>
+            <!-- Tarjeta de Días sin accidentes -->
+            <div class="col-md-3">
+                <div class="info-card text-center">
+                    <div class="icon"><i class="fas fa-calendar-check"></i></div>
+                    <h3>Días sin accidentes</h3>
+                    <div id="days-without-accidents" class="indicator-value"></div>
                     <small id="last-accident-date"></small>
-                    <div id="accident-calendar">
-                        <!-- Aquí irá el calendario de accidentes -->
-                    </div>
+                </div>
+            </div>
+            <!-- Tarjeta del Clima -->
+            <div class="col-md-3">
+                <div class="info-card">
+                    <div class="icon"><i class="fas fa-cloud-sun"></i></div>
+                    <h3>Clima en Central Bicentenario</h3>
+                    <div id="weather-data"></div>
                 </div>
             </div>
         </div>
