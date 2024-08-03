@@ -23,7 +23,7 @@ function loadWeatherData() {
  */
 function updateWeatherDisplay(weather, humidity) {
   const weatherHtml = `
-    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C  <span class="weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
+    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C  <span class="  weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
     <div><span class="weather-icon"><i class="fas fa-wind"></i></span>${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h</div>
   `;
   document.getElementById('weather-data').innerHTML = weatherHtml;
