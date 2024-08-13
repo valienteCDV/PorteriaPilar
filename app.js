@@ -23,7 +23,7 @@ function loadWeatherData() {
  */
 function updateWeatherDisplay(weather, humidity) {
   const weatherHtml = `
-    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C  <span class="  weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
+    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C  <span class="weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
     <div><span class="weather-icon"><i class="fas fa-wind"></i></span>${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h</div>
   `;
   document.getElementById('weather-data').innerHTML = weatherHtml;
@@ -86,7 +86,8 @@ function processData(data) {
   let companyData = {
     epecBicentenario: { count: 0, personas: [] },
     eling: { count: 0, personas: [] },
-    others: {}
+    others: {},
+    particulares: { count: 0, personas: [] }
   };
 
   // Procesar datos de cada empresa
@@ -95,20 +96,28 @@ function processData(data) {
       totalPersonas += empresa.cantidad;
     }
     if (empresa.personas && Array.isArray(empresa.personas)) {
-      totalCamiones += empresa.personas.filter(p => p.carga && p.carga.toString().toUpperCase().trim() === 'GASOIL').length;
-
-      if (empresa.nombre === 'EPEC BICENTENARIO') {
-        companyData.epecBicentenario.count = empresa.cantidad;
-        companyData.epecBicentenario.personas = empresa.personas;
-      } else if (empresa.nombre === 'ELING') {
-        companyData.eling.count = empresa.cantidad;
-        companyData.eling.personas = empresa.personas;
-      } else {
-        companyData.others[empresa.nombre] = {
-          count: empresa.cantidad,
-          personas: empresa.personas
-        };
-      }
+      empresa.personas.forEach(persona => {
+        if (persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL') {
+          totalCamiones++;
+        }
+        
+        if (!persona.empresa || persona.empresa.trim() === '') {
+          companyData.particulares.count++;
+          companyData.particulares.personas.push(persona);
+        } else if (persona.empresa === 'EPEC BICENTENARIO') {
+          companyData.epecBicentenario.count++;
+          companyData.epecBicentenario.personas.push(persona);
+        } else if (persona.empresa === 'ELING') {
+          companyData.eling.count++;
+          companyData.eling.personas.push(persona);
+        } else {
+          if (!companyData.others[persona.empresa]) {
+            companyData.others[persona.empresa] = { count: 0, personas: [] };
+          }
+          companyData.others[persona.empresa].count++;
+          companyData.others[persona.empresa].personas.push(persona);
+        }
+      });
     }
   });
 
@@ -125,6 +134,14 @@ function processData(data) {
     sections.otherCompanies.appendChild(companyCard);
     otherCompaniesCount += company.count;
   });
+
+  // Agregar particulares a la sección "Otros"
+  if (companyData.particulares.count > 0) {
+    const particularesCard = createCompanyCard('Particulares', companyData.particulares.personas);
+    sections.otherCompanies.appendChild(particularesCard);
+    otherCompaniesCount += companyData.particulares.count;
+  }
+
   updateSectionHeader('other-companies', otherCompaniesCount, totalPersonas);
 
   // Actualizar totales
@@ -207,8 +224,6 @@ function updateLastUpdateTime() {
     const now = new Date();
     document.getElementById('update-time').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 }
-
-
 
 /**
  * Actualiza el calendario de accidentes
