@@ -23,7 +23,7 @@ function loadWeatherData() {
  */
 function updateWeatherDisplay(weather, humidity) {
   const weatherHtml = `
-    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C  <span class="  weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
+    <div><span class="weather-icon"><i class="fas fa-thermometer-half"></i></span>${weather.temperature}°C  <span class="weather-icon"><i class="fas fa-tint"></i></span>${humidity}%</div>
     <div><span class="weather-icon"><i class="fas fa-wind"></i></span>${getWindDirection(weather.winddirection)} ${weather.windspeed} km/h</div>
   `;
   document.getElementById('weather-data').innerHTML = weatherHtml;
@@ -57,7 +57,100 @@ function loadSheetsData() {
  * Procesa los datos recibidos y actualiza el dashboard
  * @param {Object} data - Datos recibidos de la API
  */
-https://docs.google.com/spreadsheets/d/1AJ2fgdcGpowvB-0vy1BzPWhThfqACy7FwfO-sMMGf-I/edit?usp=sharing
+function processData(data) {
+  console.log('Procesando datos:', data);
+  if (!data || !data.empresas || !Array.isArray(data.empresas)) {
+    console.error('Formato de datos inválido:', data);
+    return;
+  }
+
+  const sections = {
+    epecBicentenario: document.querySelector('#epec-bicentenario .section-content'),
+    eling: document.querySelector('#eling .section-content'),
+    otherCompanies: document.querySelector('#other-companies .section-content')
+  };
+
+  // Verificar que todos los elementos existan
+  for (const [key, element] of Object.entries(sections)) {
+    if (!element) {
+      console.error(`Elemento no encontrado: ${key}`);
+      return;
+    }
+  }
+
+  // Limpiar contenido existente
+  Object.values(sections).forEach(section => section.innerHTML = '');
+
+  let totalPersonas = 0;
+  let totalCamiones = 0;
+  let companyData = {
+    epecBicentenario: { count: 0, personas: [] },
+    eling: { count: 0, personas: [] },
+    others: {}
+  };
+
+  // Procesar datos de cada empresa
+  data.empresas.forEach(empresa => {
+    if (empresa && typeof empresa.cantidad === 'number') {
+      totalPersonas += empresa.cantidad;
+    }
+    if (empresa.personas && Array.isArray(empresa.personas)) {
+      empresa.personas.forEach(persona => {
+        totalCamiones += (persona.carga && persona.carga.toString().toUpperCase().trim() === 'GASOIL') ? 1 : 0;
+
+        // Determinar la categoría de la persona
+        let category;
+        if (!empresa.nombre || empresa.nombre.trim() === '') {
+          category = 'others';
+          persona.empresaNombre = 'Particular';
+        } else if (empresa.nombre === 'EPEC BICENTENARIO') {
+          category = 'epecBicentenario';
+          persona.empresaNombre = empresa.nombre;
+        } else if (empresa.nombre === 'ELING') {
+          category = 'eling';
+          persona.empresaNombre = empresa.nombre;
+        } else {
+          category = 'others';
+          persona.empresaNombre = empresa.nombre;
+        }
+
+        // Agregar la persona a la categoría correspondiente
+        if (category === 'others') {
+          if (!companyData.others[persona.empresaNombre]) {
+            companyData.others[persona.empresaNombre] = { count: 0, personas: [] };
+          }
+          companyData.others[persona.empresaNombre].count++;
+          companyData.others[persona.empresaNombre].personas.push(persona);
+        } else {
+          companyData[category].count++;
+          companyData[category].personas.push(persona);
+        }
+      });
+    }
+  });
+
+  // Mostrar datos de cada empresa
+  displayCompanyPersonnel(sections.epecBicentenario, companyData.epecBicentenario.personas);
+  updateSectionHeader('epec-bicentenario', companyData.epecBicentenario.count, totalPersonas);
+
+  displayCompanyPersonnel(sections.eling, companyData.eling.personas);
+  updateSectionHeader('eling', companyData.eling.count, totalPersonas);
+
+  let otherCompaniesCount = 0;
+  Object.entries(companyData.others).forEach(([companyName, company]) => {
+    const companyCard = createCompanyCard(companyName, company.personas);
+    sections.otherCompanies.appendChild(companyCard);
+    otherCompaniesCount += company.count;
+  });
+  updateSectionHeader('other-companies', otherCompaniesCount, totalPersonas);
+
+  // Actualizar totales
+  document.getElementById('total-personas').textContent = totalPersonas;
+  document.getElementById('total-camiones').textContent = totalCamiones;
+
+  // Actualizar tiempo de última actualización
+  updateLastUpdateTime();
+}
 
 /**
  * Actualiza el encabezado de una sección con el conteo y porcentaje
@@ -131,8 +224,6 @@ function updateLastUpdateTime() {
     const now = new Date();
     document.getElementById('update-time').textContent = now.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
 }
-
-
 
 /**
  * Actualiza el calendario de accidentes
